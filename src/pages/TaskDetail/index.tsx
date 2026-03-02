@@ -1,0 +1,222 @@
+import React, { useState, useEffect } from 'react';
+import type { useParams, useNavigate } from 'react-router-dom';
+import {
+  Card,
+  Descriptions,
+  Tag,
+  Progress,
+  Button,
+  Space,
+  Divider,
+  message,
+  Spin,
+  Avatar,
+  List,
+  Comment,
+  Form,
+  Input,
+} from 'antd';
+import {
+  EditOutlined,
+  DeleteOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  ArrowLeftOutlined,
+} from '@ant-design/icons';
+import type { taskService, Task } from '../../services/task.service';
+import type { useTaskStore } from '../../stores/task.store';
+import type { formatDate, getPriorityColor } from '../../utils/storage';
+
+const { TextArea } = Input;
+
+const TaskDetail: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const { updateTask, removeTask } = useTaskStore();
+  const [task, setTask] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [comment, setComment] = useState('');
+
+  useEffect(() => {
+    loadTask();
+  }, [id]);
+
+  const loadTask = async () => {
+    if (!id) return;
+    
+    try {
+      setLoading(true);
+      const taskData = await taskService.getTask(parseInt(id));
+      setTask(taskData);
+    } catch (error) {
+      message.error('加载任务失败');
+      navigate('/tasks');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAccept = async () => {
+    if (!task) return;
+    
+    try {
+      const updatedTask = await taskService.acceptTask(task.id, comment);
+      updateTask(task.id, updatedTask);
+      message.success('验收成功');
+      navigate('/tasks');
+    } catch (error) {
+      message.error('验收失败');
+    }
+  };
+
+  const handleReject = async () => {
+    if (!task) return;
+    
+    try {
+      const updatedTask = await taskService.rejectTask(task.id, comment);
+      updateTask(task.id, updatedTask);
+      message.success('已驳回');
+      navigate('/tasks');
+    } catch (error) {
+      message.error('驳回失败');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!task) return;
+    
+    try {
+      await taskService.deleteTask(task.id);
+      removeTask(task.id);
+      message.success('删除成功');
+      navigate('/tasks');
+    } catch (error) {
+      message.error('删除失败');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: '100px 0' }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!task) {
+    return <div>任务不存在</div>;
+  }
+
+  return (
+    <div>
+      <div style={{ marginBottom: 24 }}>
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={() => navigate('/tasks')}
+        >
+          返回
+        </Button>
+      </div>
+
+      <Card>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+          <h1>{task.title}</h1>
+          <Space>
+            <Button
+              icon={<EditOutlined />}
+              onClick={() => navigate(`/tasks/${task.id}/edit`)}
+            >
+              编辑
+            </Button>
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              onClick={handleDelete}
+            >
+              删除
+            </Button>
+          </Space>
+        </div>
+
+        <Descriptions bordered column={2}>
+          <Descriptions.Item label="任务状态">
+            <Tag color={task.status === 'completed' || task.status === 'accepted' ? 'success' : 'processing'}>
+              {task.status}
+            </Tag>
+          </Descriptions.Item>
+          <Descriptions.Item label="优先级">
+            <Tag color={getPriorityColor(task.priority)}>
+              {task.priority}
+            </Tag>
+          </Descriptions.Item>
+          <Descriptions.Item label="进度">
+            <Progress percent={task.progress} />
+          </Descriptions.Item>
+          <Descriptions.Item label="截止日期">
+            {formatDate(task.dueDate)}
+          </Descriptions.Item>
+          <Descriptions.Item label="创建时间">
+            {formatDate(task.createdAt)}
+          </Descriptions.Item>
+          <Descriptions.Item label="更新时间">
+            {formatDate(task.updatedAt)}
+          </Descriptions.Item>
+          <Descriptions.Item label="负责人" span={2}>
+            {task.assignments.length > 0 ? (
+              <Space>
+                {task.assignments.map((assignment) => (
+                  <Tag key={assignment.agentId} icon={<Avatar size="small">{assignment.agentName[0]}</Avatar>}>
+                    {assignment.agentName} ({assignment.role})
+                  </Tag>
+                ))}
+              </Space>
+            ) : (
+              '未分配'
+            )}
+          </Descriptions.Item>
+        </Descriptions>
+
+        <Divider />
+
+        <div>
+          <h3>任务描述</h3>
+          <p style={{ lineHeight: 1.8 }}>{task.description}</p>
+        </div>
+
+        <Divider />
+
+        <div>
+          <h3>评论</h3>
+          <Form.Item>
+            <TextArea
+              rows={4}
+              placeholder="添加评论..."
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+          </Form.Item>
+          <Space>
+            <Button
+              type="primary"
+              icon={<CheckOutlined />}
+              onClick={handleAccept}
+              disabled={!comment}
+            >
+              验收通过
+            </Button>
+            <Button
+              danger
+              icon={<CloseOutlined />}
+              onClick={handleReject}
+              disabled={!comment}
+            >
+              驳回
+            </Button>
+          </Space>
+        </div>
+      </Card>
+    </div>
+  );
+};
+
+export default TaskDetail;
