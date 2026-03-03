@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import type { Form, Input, Button, Card, message, Checkbox } from 'antd';
-import type { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
-import type { useNavigate, Link } from 'react-router-dom';
-import type { useAuthStore } from '../../stores/auth.store';
-import type { authService, LoginDTO } from '../../services/auth.service';
+import { Form, Input, Button, Card, message, Checkbox } from 'antd';
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuthStore } from '../../stores/auth.store';
+import { authService, LoginDTO } from '../../services/auth.service';
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Card,
   Descriptions,
@@ -11,8 +11,6 @@ import {
   message,
   Spin,
   Avatar,
-  List,
-  Comment,
   Form,
   Input,
 } from 'antd';
@@ -23,9 +21,9 @@ import {
   CloseOutlined,
   ArrowLeftOutlined,
 } from '@ant-design/icons';
-import type { taskService, Task } from '../../services/task.service';
-import type { useTaskStore } from '../../stores/task.store';
-import type { formatDate, getPriorityColor } from '../../utils/storage';
+import { taskService, Task } from '../../services/task.service';
+import { useTaskStore } from '../../stores/task.store';
+import { formatDate, getPriorityColor } from '../../utils/storage';
 
 const { TextArea } = Input;
 

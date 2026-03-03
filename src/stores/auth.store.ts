@@ -1,4 +1,4 @@
-import type { create } from 'zustand';
+import { create } from 'zustand';
 
 interface User {
   id: number;

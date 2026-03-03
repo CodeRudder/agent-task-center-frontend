@@ -1,5 +1,5 @@
-import type { useEffect, useState } from 'react';
-import type { getWithETag } from '../services/api';
+import { useEffect, useState } from 'react';
+import { getWithETag } from '../services/api';
 
 interface UsePollingOptions {
   url: string;

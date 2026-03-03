@@ -10,9 +10,9 @@ import {
   Row,
   Col,
 } from 'antd';
-import type { TeamOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import type { agentService, Agent } from '../../services/agent.service';
-import type { formatDate } from '../../utils/storage';
+import { TeamOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { agentService, Agent } from '../../services/agent.service';
+import { formatDate } from '../../utils/storage';
 
 const { Option } = Select;
 

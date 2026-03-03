@@ -1,7 +1,7 @@
 import React from 'react';
-import type { Row, Col, Card, Statistic } from 'antd';
+import { Row, Col, Card, Statistic } from 'antd';
 import {
-  TaskOutlined,
+  TagsOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
   TeamOutlined,
@@ -18,7 +18,7 @@ const Dashboard: React.FC = () => {
             <Statistic
               title="总任务数"
               value={15}
-              prefix={<TaskOutlined />}
+              prefix={<TagsOutlined />}
             />
           </Card>
         </Col>

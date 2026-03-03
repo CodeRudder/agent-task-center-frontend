@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 // 创建axios实例
 const api: AxiosInstance = axios.create({

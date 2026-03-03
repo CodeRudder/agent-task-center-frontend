@@ -1,8 +1,8 @@
 import React from 'react';
-import type { Card, Tag, Progress, Button, Space } from 'antd';
-import type { EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import type { Task } from '../../services/task.service';
-import type { formatDate, getPriorityColor, isOverdue } from '../../utils/storage';
+import { Card, Tag, Progress, Button, Space } from 'antd';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { Task } from '../../services/task.service';
+import { formatDate, getPriorityColor, isOverdue } from '../../utils/storage';
 
 interface TaskCardProps {
   task: Task;

@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import type { RouterProvider } from 'react-router-dom';
-import type { ConfigProvider } from 'antd';
+import { RouterProvider } from 'react-router-dom';
+import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
-import type { router } from './router';
+import { router } from './router';
 import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
