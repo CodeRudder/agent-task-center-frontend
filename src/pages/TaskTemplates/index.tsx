@@ -15,7 +15,6 @@ import {
   Card,
   Row,
   Col,
-  Divider,
 } from 'antd';
 import {
   PlusOutlined,
@@ -303,7 +302,7 @@ const TaskTemplates: React.FC = () => {
         destroyOnClose
       >
         <Form form={form} layout="vertical">
-          <Divider orientation="left">基本信息</Divider>
+          <h3 style={{ marginTop: 0 }}>基本信息</h3>
           
           <Form.Item
             name="name"
@@ -321,7 +320,7 @@ const TaskTemplates: React.FC = () => {
             <TextArea rows={2} placeholder="描述这个模板的用途和适用场景" />
           </Form.Item>
 
-          <Divider orientation="left">任务字段配置（可选）</Divider>
+          <h3>任务字段配置（可选）</h3>
 
           <Form.Item
             name="title"
@@ -413,7 +412,7 @@ const TaskTemplates: React.FC = () => {
               <strong>描述：</strong>
               {previewTemplate.description}
             </p>
-            <Divider />
+            <hr style={{ margin: '16px 0' }} />
             <h4>任务字段配置：</h4>
             <ul>
               {previewTemplate.fields.title && (
