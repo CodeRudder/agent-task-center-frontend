@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Button, Modal, Form, Input, Select, DatePicker, InputNumber, message, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import TaskCard from '../../components/TaskCard';
 import { useTaskStore } from '../../stores/task.store';
 import { taskService, Task, CreateTaskDTO, UpdateTaskDTO } from '../../services/task.service';
@@ -50,7 +51,7 @@ const TaskList: React.FC = () => {
     setEditingTask(task);
     form.setFieldsValue({
       ...task,
-      dueDate: new Date(task.dueDate),
+      dueDate: dayjs(task.dueDate),
     });
     setModalVisible(true);
   };
