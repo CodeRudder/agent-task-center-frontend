@@ -74,6 +74,7 @@ const Login: React.FC = () => {
           form={form}
           name="login"
           onFinish={onFinish}
+          onSubmit={(e) => e.preventDefault()}
           autoComplete="off"
           size="large"
           layout="vertical"
