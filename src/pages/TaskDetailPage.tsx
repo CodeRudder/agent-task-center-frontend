@@ -48,21 +48,9 @@ const TaskDetailPage: React.FC = () => {
   const [commentInput, setCommentInput] = useState('');
   
   // 删除确认弹窗状态
-  const [deleteTaskDialogOpen, setDeleteTaskDialogOpen] = useState(false);
-  const [deleteCommentDialogOpen, setDeleteCommentDialogOpen] = useState(false);
-  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
-
-  // 编辑模式状态
-  const [isEditing, setIsEditing] = useState(false);
-  const [editFormData, setEditFormData] = useState({
-    title: '',
-    description: '',
-    status: 'todo' as TaskStatus,
-    priority: 'medium' as TaskPriority,
-    dueDate: '',
-  });
-  const [isSaving, setIsSaving] = useState(false);
-
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [deleteTaskInfo, setDeleteTaskInfo] = useState<{ title: string; id: number; type: 'task' | 'comment'; commentId?: string } | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -120,7 +108,13 @@ const TaskDetailPage: React.FC = () => {
 
   const handleDeleteTask = async () => {
     if (!currentTask) return;
-    setDeleteTaskDialogOpen(true);
+    
+    setDeleteTaskInfo({
+      title: currentTask.title,
+      id: parseInt(id!),
+      type: 'task'
+    });
+    setDeleteDialogVisible(true);
   };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
@@ -140,35 +134,43 @@ const TaskDetailPage: React.FC = () => {
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    setCommentToDelete(commentId);
-    setDeleteCommentDialogOpen(true);
+    const comment = comments.find(c => c.id === commentId);
+    if (!comment) return;
+    
+    setDeleteTaskInfo({
+      title: comment.content,
+      id: parseInt(id!),
+      type: 'comment',
+      commentId
+    });
+    setDeleteDialogVisible(true);
   };
 
-  const confirmDeleteTask = async () => {
-    if (!id) return;
+  const handleConfirmDelete = async () => {
+    if (!deleteTaskInfo) return;
     
+    setDeleteLoading(true);
     try {
-      await useTaskStore.getState().deleteTask(id);
-      setDeleteTaskDialogOpen(false);
-      navigate('/tasks');
+      if (deleteTaskInfo.type === 'task') {
+        await useTaskStore.getState().deleteTask(deleteTaskInfo.id.toString());
+        navigate('/tasks');
+      } else if (deleteTaskInfo.type === 'comment' && deleteTaskInfo.commentId) {
+        await deleteComment(deleteTaskInfo.id.toString(), deleteTaskInfo.commentId);
+        loadComments(deleteTaskInfo.id.toString());
+      }
     } catch (error) {
-      console.error('删除任务失败:', error);
-      alert('删除任务失败，请重试');
+      console.error('操作失败:', error);
+      alert('操作失败，请重试');
+    } finally {
+      setDeleteLoading(false);
+      setDeleteDialogVisible(false);
+      setDeleteTaskInfo(null);
     }
   };
 
-  const confirmDeleteComment = async () => {
-    if (!id || !commentToDelete) return;
-    
-    try {
-      await deleteComment(id, commentToDelete);
-      setDeleteCommentDialogOpen(false);
-      setCommentToDelete(null);
-      loadComments(id);
-    } catch (error) {
-      console.error('删除评论失败:', error);
-      alert('删除评论失败，请重试');
-    }
+  const handleCancelDelete = () => {
+    setDeleteDialogVisible(false);
+    setDeleteTaskInfo(null);
   };
 
   const getStatusText = (status: TaskStatus) => {
@@ -593,31 +595,16 @@ const TaskDetailPage: React.FC = () => {
       </div>
 
       {/* 删除确认弹窗 */}
-      <DeleteConfirmationDialog
-        isOpen={deleteTaskDialogOpen}
-        onClose={() => setDeleteTaskDialogOpen(false)}
-        onConfirm={confirmDeleteTask}
-        title="确认删除任务"
-        message="确定要删除此任务吗？"
-        itemInfo={currentTask ? [
-          { label: '任务标题', value: currentTask.title },
-          { label: '任务ID', value: currentTask.id }
-        ] : undefined}
-      />
-
-      <DeleteConfirmationDialog
-        isOpen={deleteCommentDialogOpen}
-        onClose={() => {
-          setDeleteCommentDialogOpen(false);
-          setCommentToDelete(null);
-        }}
-        onConfirm={confirmDeleteComment}
-        title="确认删除评论"
-        message="确定要删除此评论吗？"
-        itemInfo={commentToDelete ? [
-          { label: '评论ID', value: commentToDelete }
-        ] : undefined}
-      />
+      {deleteTaskInfo && (
+        <DeleteConfirmationDialog
+          visible={deleteDialogVisible}
+          taskTitle={deleteTaskInfo.type === 'task' ? deleteTaskInfo.title : `评论: ${deleteTaskInfo.title.slice(0, 30)}...`}
+          taskId={deleteTaskInfo.id}
+          onCancel={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          loading={deleteLoading}
+        />
+      )}
     </div>
   );
 };
