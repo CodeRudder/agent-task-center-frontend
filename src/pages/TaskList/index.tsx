@@ -15,6 +15,7 @@ const TaskList: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
   const [form] = Form.useForm();
 
   // 初始加载任务
@@ -59,11 +60,14 @@ const TaskList: React.FC = () => {
   // 删除任务
   const handleDelete = async (id: number) => {
     try {
+      setDeleteLoading(id);
       await taskService.deleteTask(id);
       removeTask(id);
       message.success('删除成功');
     } catch (error) {
       message.error('删除失败');
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
@@ -149,6 +153,7 @@ const TaskList: React.FC = () => {
                     task={task}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    deleteLoading={deleteLoading === task.id}
                   />
                 ))}
               </div>
