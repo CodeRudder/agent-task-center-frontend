@@ -32,8 +32,10 @@ const TaskListPage: React.FC = () => {
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   
   // 删除确认弹窗状态
-  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
-  const [deleteTaskInfo, setDeleteTaskInfo] = useState<{ title: string; id: number; type: 'single' | 'batch' | 'archive' } | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [batchDeleteDialogOpen, setBatchDeleteDialogOpen] = useState(false);
+  const [batchArchiveDialogOpen, setBatchArchiveDialogOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const {
@@ -103,63 +105,53 @@ const TaskListPage: React.FC = () => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
     
-    setDeleteTaskInfo({
-      title: task.title,
-      id: parseInt(taskId),
-      type: 'single'
-    });
-    setDeleteDialogVisible(true);
+    setTaskToDelete({ id: task.id, title: task.title });
+    setDeleteDialogOpen(true);
   };
 
   const handleBatchDelete = async () => {
     if (selectedTasks.length === 0) return;
-    
-    setDeleteTaskInfo({
-      title: `${selectedTasks.length} 个任务`,
-      id: selectedTasks.length,
-      type: 'batch'
-    });
-    setDeleteDialogVisible(true);
+    setBatchDeleteDialogOpen(true);
   };
 
   const handleBatchArchive = async () => {
     if (selectedTasks.length === 0) return;
-    
-    setDeleteTaskInfo({
-      title: `${selectedTasks.length} 个任务`,
-      id: selectedTasks.length,
-      type: 'archive'
-    });
-    setDeleteDialogVisible(true);
+    setBatchArchiveDialogOpen(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!deleteTaskInfo) return;
+  const confirmDeleteTask = async () => {
+    if (!taskToDelete) return;
     
-    setDeleteLoading(true);
     try {
-      if (deleteTaskInfo.type === 'single') {
-        await useTaskStore.getState().deleteTask(deleteTaskInfo.id.toString());
-      } else if (deleteTaskInfo.type === 'batch') {
-        await batchDeleteTasks(selectedTasks);
-        clearSelection();
-      } else if (deleteTaskInfo.type === 'archive') {
-        await batchArchiveTasks(selectedTasks);
-        clearSelection();
-      }
+      await useTaskStore.getState().deleteTask(taskToDelete.id);
+      setDeleteDialogOpen(false);
+      setTaskToDelete(null);
       loadTasks();
     } catch (error) {
-      console.error('操作失败:', error);
-    } finally {
-      setDeleteLoading(false);
-      setDeleteDialogVisible(false);
-      setDeleteTaskInfo(null);
+      console.error('删除任务失败:', error);
     }
   };
 
-  const handleCancelDelete = () => {
-    setDeleteDialogVisible(false);
-    setDeleteTaskInfo(null);
+  const confirmBatchDelete = async () => {
+    try {
+      await batchDeleteTasks(selectedTasks);
+      setBatchDeleteDialogOpen(false);
+      clearSelection();
+      loadTasks();
+    } catch (error) {
+      console.error('批量删除失败:', error);
+    }
+  };
+
+  const confirmBatchArchive = async () => {
+    try {
+      await batchArchiveTasks(selectedTasks);
+      setBatchArchiveDialogOpen(false);
+      clearSelection();
+      loadTasks();
+    } catch (error) {
+      console.error('批量归档失败:', error);
+    }
   };
 
   const getStatusText = (status: TaskStatus) => {
@@ -539,16 +531,45 @@ const TaskListPage: React.FC = () => {
       </Modal>
 
       {/* 删除确认弹窗 */}
-      {deleteTaskInfo && (
-        <DeleteConfirmationDialog
-          visible={deleteDialogVisible}
-          taskTitle={deleteTaskInfo.title}
-          taskId={deleteTaskInfo.id}
-          onCancel={handleCancelDelete}
-          onConfirm={handleConfirmDelete}
-          loading={deleteLoading}
-        />
-      )}
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setTaskToDelete(null);
+        }}
+        onConfirm={confirmDeleteTask}
+        title="确认删除任务"
+        message="确定要删除此任务吗？"
+        itemInfo={taskToDelete ? [
+          { label: '任务标题', value: taskToDelete.title },
+          { label: '任务ID', value: taskToDelete.id }
+        ] : undefined}
+      />
+
+      {/* 批量删除确认弹窗 */}
+      <DeleteConfirmationDialog
+        isOpen={batchDeleteDialogOpen}
+        onClose={() => setBatchDeleteDialogOpen(false)}
+        onConfirm={confirmBatchDelete}
+        title="确认批量删除"
+        message={`确定要删除选中的 ${selectedTasks.length} 个任务吗？`}
+        itemInfo={[
+          { label: '删除数量', value: `${selectedTasks.length} 个任务` }
+        ]}
+      />
+
+      {/* 批量归档确认弹窗 */}
+      <DeleteConfirmationDialog
+        isOpen={batchArchiveDialogOpen}
+        onClose={() => setBatchArchiveDialogOpen(false)}
+        onConfirm={confirmBatchArchive}
+        title="确认批量归档"
+        message={`确定要归档选中的 ${selectedTasks.length} 个任务吗？`}
+        itemInfo={[
+          { label: '归档数量', value: `${selectedTasks.length} 个任务` }
+        ]}
+        danger={false}
+      />
     </div>
   );
 };

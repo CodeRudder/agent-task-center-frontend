@@ -7,26 +7,31 @@ import { Modal } from '@/components/Modal';
 import { Button } from '@/components/Button';
 
 export interface DeleteConfirmationDialogProps {
-  visible: boolean;
-  taskTitle: string;
-  taskId: number;
-  onCancel: () => void;
+  isOpen: boolean;
+  onClose: () => void;
   onConfirm: () => void;
-  loading?: boolean;
+  title?: string;
+  message?: string;
+  itemInfo?: {
+    label: string;
+    value: string;
+  }[];
+  danger?: boolean;
 }
 
-const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
-  visible,
-  taskTitle,
-  taskId,
-  onCancel,
+export const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
+  isOpen,
+  onClose,
   onConfirm,
-  loading = false,
+  title = '确认删除',
+  message = '确定要删除吗？此操作不可恢复。',
+  itemInfo,
+  danger = true,
 }) => {
   return (
     <Modal
-      isOpen={visible}
-      onClose={onCancel}
+      isOpen={isOpen}
+      onClose={onClose}
       title=""
       showCloseButton={false}
       closeOnOverlayClick={false}
@@ -35,18 +40,16 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
         <div className="flex justify-end gap-3">
           <Button
             variant="secondary"
-            onClick={onCancel}
-            disabled={loading}
+            onClick={onClose}
           >
             取消
           </Button>
           <Button
-            variant="danger"
+            variant={danger ? 'danger' : 'primary'}
             onClick={onConfirm}
-            disabled={loading}
             className="min-w-[100px]"
           >
-            {loading ? '删除中...' : '确认删除'}
+            确认删除
           </Button>
         </div>
       }
@@ -57,31 +60,31 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
           <AlertTriangle className="h-6 w-6 text-orange-600" />
         </div>
         <h3 className="text-lg font-semibold text-orange-600">
-          确认删除
+          {title}
         </h3>
       </div>
 
       {/* 内容 */}
       <div className="space-y-4">
-        <p className="text-gray-700">您确定要删除任务吗？</p>
+        <p className="text-gray-700">{message}</p>
 
-        {/* 任务信息 */}
-        <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-          <div className="text-sm text-gray-600">
-            <span className="font-medium text-gray-900">任务标题：</span>
-            {taskTitle}
+        {/* 项目信息 */}
+        {itemInfo && itemInfo.length > 0 && (
+          <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+            {itemInfo.map((item, index) => (
+              <div key={index} className="text-sm text-gray-600">
+                <span className="font-medium text-gray-900">{item.label}：</span>
+                {item.value}
+              </div>
+            ))}
           </div>
-          <div className="text-sm text-gray-600">
-            <span className="font-medium text-gray-900">任务ID：</span>
-            {taskId}
-          </div>
-        </div>
+        )}
 
         {/* 警告提示 */}
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
           <p className="text-sm text-orange-700 font-medium">
-            此操作不可恢复
+            此操作不可恢复，请谨慎操作。
           </p>
         </div>
       </div>
