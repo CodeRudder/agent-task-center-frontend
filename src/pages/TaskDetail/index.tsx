@@ -27,6 +27,30 @@ import { formatDate, getPriorityColor } from '../../utils/storage';
 
 const { TextArea } = Input;
 
+const getStatusColor = (status: string): string => {
+  const colorMap: Record<string, string> = {
+    todo: 'default',
+    in_progress: 'processing',
+    review: 'warning',
+    done: 'success',
+    accepted: 'success',
+    rejected: 'error',
+  };
+  return colorMap[status] || 'default';
+};
+
+const getStatusText = (status: string): string => {
+  const textMap: Record<string, string> = {
+    todo: '待办',
+    in_progress: '进行中',
+    review: '待验收',
+    done: '已完成',
+    accepted: '已验收',
+    rejected: '已驳回',
+  };
+  return textMap[status] || status;
+};
+
 const TaskDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -138,8 +162,8 @@ const TaskDetail: React.FC = () => {
 
         <Descriptions bordered column={2}>
           <Descriptions.Item label="任务状态">
-            <Tag color={task.status === 'completed' || task.status === 'accepted' ? 'success' : 'processing'}>
-              {task.status}
+            <Tag color={getStatusColor(task.status)}>
+              {getStatusText(task.status)}
             </Tag>
           </Descriptions.Item>
           <Descriptions.Item label="优先级">
@@ -183,35 +207,83 @@ const TaskDetail: React.FC = () => {
 
         <Divider />
 
-        <div>
-          <h3>评论</h3>
-          <Form.Item>
-            <TextArea
-              rows={4}
-              placeholder="添加评论..."
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-          </Form.Item>
-          <Space>
-            <Button
-              type="primary"
-              icon={<CheckOutlined />}
-              onClick={handleAccept}
-              disabled={!comment}
-            >
-              验收通过
-            </Button>
-            <Button
-              danger
-              icon={<CloseOutlined />}
-              onClick={handleReject}
-              disabled={!comment}
-            >
-              驳回
-            </Button>
-          </Space>
-        </div>
+        {task.status === 'done' && (
+          <div>
+            <h3>任务验收</h3>
+            <p style={{ color: '#666', marginBottom: 16 }}>
+              任务已完成，请进行验收
+            </p>
+            <Form.Item>
+              <TextArea
+                rows={4}
+                placeholder="输入验收意见或驳回原因..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+            </Form.Item>
+            <Space>
+              <Button
+                type="primary"
+                icon={<CheckOutlined />}
+                onClick={handleAccept}
+              >
+                验收通过
+              </Button>
+              <Button
+                danger
+                icon={<CloseOutlined />}
+                onClick={handleReject}
+                disabled={!comment}
+              >
+                驳回
+              </Button>
+            </Space>
+          </div>
+        )}
+
+        {task.status === 'accepted' && task.metadata?.acceptComment && (
+          <div>
+            <h3>验收记录</h3>
+            <Card style={{ backgroundColor: '#f6ffed', borderColor: '#52c41a' }}>
+              <Tag color="success" icon={<CheckOutlined />} style={{ marginBottom: 8 }}>
+                已通过验收
+              </Tag>
+              <p style={{ marginBottom: 0 }}>{task.metadata.acceptComment}</p>
+              {task.metadata.acceptedAt && (
+                <p style={{ color: '#999', fontSize: 12, marginTop: 8 }}>
+                  验收时间: {formatDate(task.metadata.acceptedAt)}
+                </p>
+              )}
+            </Card>
+          </div>
+        )}
+
+        {task.status === 'rejected' && task.metadata?.rejectReason && (
+          <div>
+            <h3>驳回记录</h3>
+            <Card style={{ backgroundColor: '#fff2f0', borderColor: '#ff4d4f' }}>
+              <Tag color="error" icon={<CloseOutlined />} style={{ marginBottom: 8 }}>
+                已驳回
+              </Tag>
+              <p style={{ marginBottom: 8 }}>{task.metadata.rejectReason}</p>
+              {task.metadata.requiredChanges && task.metadata.requiredChanges.length > 0 && (
+                <div style={{ marginBottom: 8 }}>
+                  <strong>需要修改：</strong>
+                  <ul style={{ marginTop: 4, marginBottom: 0 }}>
+                    {task.metadata.requiredChanges.map((change, index) => (
+                      <li key={index}>{change}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {task.metadata.rejectedAt && (
+                <p style={{ color: '#999', fontSize: 12, marginTop: 8 }}>
+                  驳回时间: {formatDate(task.metadata.rejectedAt)}
+                </p>
+              )}
+            </Card>
+          </div>
+        )}
       </Card>
     </div>
   );

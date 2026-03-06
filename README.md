@@ -1,310 +1,470 @@
-# Agent任务管理系统 - 前端
+# V5.0 前端开发项目
 
-## 📊 项目状态
-- **版本**: v1.0.0
-- **完成度**: 96%
-- **技术Review**: ✅ 通过（架构师 @claw2-architect）
-- **完成时间**: 2026-03-03 02:20（提前6天19小时）
+## 项目概述
 
-## 🎯 项目信息
-- **技术栈**: React 18 + TypeScript + Vite
-- **UI框架**: Ant Design 5.x
+这是 V5.0 Agent 任务管理系统的前端实现，基于 React 18 + TypeScript + Tailwind CSS + Zustand 构建。
+
+### 核心功能
+
+1. **Token 管理页面**
+   - Agent 列表展示（搜索、筛选、排序）
+   - Token 生成/撤销/重新生成
+   - Token 安全展示（仅显示一次）
+   - Agent 详情抽屉
+   - 操作日志查看
+   - 批量操作支持
+
+2. **用户认证页面**
+   - 登录界面（用户名/密码）
+   - 密码找回和重置
+   - 密码强度实时检测
+   - 防暴力破解（5次失败锁定15分钟）
+   - 会话管理
+   - JWT Token 认证
+
+### 技术栈
+
+- **框架**: React 18
+- **语言**: TypeScript
+- **样式**: Tailwind CSS
 - **状态管理**: Zustand
 - **路由**: React Router v6
 - **HTTP客户端**: Axios
-- **开发时间**: 41分钟（原计划7天）
+- **图标库**: Lucide React
+- **构建工具**: Vite
 
-## ✅ 已完成功能（Week 1）
-
-### 1. 项目骨架 ✅
-- [x] Vite + React + TypeScript模板
-- [x] 完整的目录结构
-- [x] 环境变量配置
-- [x] 路由系统
-- [x] 布局组件
-
-### 2. 核心功能 ✅
-
-#### API服务
-- [x] Axios实例配置
-- [x] 请求拦截器（自动添加Token）
-- [x] 响应拦截器（自动保存ETag）
-- [x] ETag缓存支持
-- [x] 401自动跳转登录
-
-#### 轮询优化
-- [x] 30秒轮询间隔
-- [x] ETag缓存机制
-- [x] 304 Not Modified处理
-- [x] 后台标签页暂停轮询
-- [x] 可见性监听
-
-#### 状态管理
-- [x] auth.store: 用户认证状态
-- [x] task.store: 任务状态管理
-- [x] Token自动存储
-- [x] 用户信息管理
-
-#### 工具函数
-- [x] 本地存储操作
-- [x] 日期格式化
-- [x] 任务延期检测
-- [x] 优先级/状态颜色映射
-
-### 3. 页面组件 ✅
-
-#### 登录页面
-- [x] 登录表单UI
-- [x] 表单验证（邮箱格式、密码长度）
-- [x] 登录逻辑
-- [x] Token存储
-- [x] 记住邮箱功能
-- [x] 忘记密码链接
-- [x] 测试账户提示
-
-#### 仪表盘页面
-- [x] 统计卡片（4个指标）
-- [x] 欢迎信息
-
-#### 任务看板页面
-- [x] 四列布局（待办/进行中/已完成/已验收）
-- [x] 任务卡片组件
-- [x] 任务创建/编辑模态框
-- [x] 进度条显示
-- [x] 优先级标签
-- [x] 截止日期显示
-- [x] 延期任务高亮
-- [x] 轮询更新任务（30秒）
-- [x] ETag缓存
-
-#### 任务详情页面
-- [x] 任务详情展示（Descriptions组件）
-- [x] 操作按钮（编辑/删除/验收/驳回）
-- [x] 进度显示（Progress组件）
-- [x] 评论功能（TextArea）
-- [x] 负责人信息（Avatar + Tag）
-
-#### Agent列表页面
-- [x] Agent列表表格
-- [x] 筛选功能（状态、类型）
-- [x] 统计卡片（4个指标）
-- [x] 负载进度条
-- [x] 能力标签显示
-
-### 4. 路由系统 ✅
-- [x] 路由配置（5个页面）
-- [x] 路由守卫（未登录跳转）
-- [x] 嵌套路由
-- [x] 404处理
-
-### 5. 布局组件 ✅
-- [x] Header: 顶部导航栏
-- [x] Sidebar: 左侧菜单
-- [x] Content: 内容区域
-- [x] 用户菜单（退出登录）
-
-## 📁 目录结构
+## 项目结构
 
 ```
-frontend/
+v5-frontend/
 ├── src/
-│   ├── components/        # 组件
-│   │   ├── Layout/       # 布局组件 ✅
-│   │   ├── TaskCard/     # 任务卡片 ✅
-│   │   ├── TaskBoard/    # 任务看板
-│   │   └── AgentCard/    # Agent卡片
-│   ├── pages/            # 页面
-│   │   ├── Login/        # 登录页 ✅
-│   │   ├── Dashboard/    # 仪表盘 ✅
-│   │   ├── TaskList/     # 任务列表 ✅
-│   │   ├── TaskDetail/   # 任务详情 ✅
-│   │   └── AgentList/    # Agent列表 ✅
-│   ├── services/         # 服务
-│   │   ├── api.ts        # API配置 ✅
-│   │   ├── auth.service.ts # 认证服务 ✅
-│   │   ├── task.service.ts # 任务服务 ✅
-│   │   └── agent.service.ts # Agent服务 ✅
-│   ├── stores/           # 状态管理
-│   │   ├── auth.store.ts # 认证状态 ✅
-│   │   └── task.store.ts # 任务状态 ✅
-│   ├── hooks/            # 自定义Hooks
-│   │   └── usePolling.ts # 轮询Hook ✅
-│   ├── utils/            # 工具函数
-│   │   └── storage.ts    # 存储工具 ✅
-│   ├── router.tsx        # 路由配置 ✅
-│   ├── App.tsx           # 根组件 ✅
-│   ├── main.tsx          # 入口文件 ✅
-│   └── index.css         # 全局样式 ✅
-├── .env                  # 环境变量 ✅
-├── package.json          # 依赖配置 ✅
-├── tsconfig.json         # TypeScript配置 ✅
-└── README.md             # 项目文档 ✅
+│   ├── components/          # 可复用组件
+│   │   ├── Button.tsx       # 按钮组件
+│   │   ├── Input.tsx        # 输入框组件
+│   │   ├── PasswordInput.tsx # 密码输入框
+│   │   ├── Modal.tsx        # 模态框
+│   │   ├── Drawer.tsx       # 侧边抽屉
+│   │   ├── Toast.tsx        # Toast 通知
+│   │   ├── StatusBadge.tsx  # 状态徽章
+│   │   ├── Tag.tsx          # 标签
+│   │   ├── Skeleton.tsx     # 骨架屏
+│   │   ├── TokenDisplay.tsx # Token 显示对话框
+│   │   ├── AgentListItem.tsx # Agent 列表项
+│   │   ├── PasswordStrengthIndicator.tsx # 密码强度指示器
+│   │   └── LoginError.tsx   # 登录错误提示
+│   │
+│   ├── pages/               # 页面组件
+│   │   ├── LoginPage.tsx    # 登录页面
+│   │   └── TokenManagementPage.tsx # Token 管理页面
+│   │
+│   ├── stores/              # Zustand 状态管理
+│   │   ├── authStore.ts     # 认证状态
+│   │   └── agentStore.ts    # Agent 状态
+│   │
+│   ├── services/            # API 服务
+│   │   ├── api.ts           # Axios 客户端配置
+│   │   ├── authService.ts   # 认证 API
+│   │   └── agentService.ts  # Agent API
+│   │
+│   ├── hooks/               # 自定义 Hooks
+│   │   ├── useToast.ts      # Toast Hook
+│   │   ├── useDebounce.ts   # 防抖 Hook
+│   │   └── useModal.ts      # 模态框 Hook
+│   │
+│   ├── types/               # TypeScript 类型定义
+│   │   ├── agent.ts         # Agent 类型
+│   │   ├── auth.ts          # 认证类型
+│   │   └── api.ts           # API 类型
+│   │
+│   ├── utils/               # 工具函数
+│   │   ├── cn.ts            # 类名合并
+│   │   ├── format.ts        # 格式化函数
+│   │   └── validation.ts    # 验证函数
+│   │
+│   ├── App.tsx              # 主应用组件
+│   ├── main.tsx             # 应用入口
+│   └── index.css            # 全局样式
+│
+├── public/                  # 静态资源
+├── index.html               # HTML 模板
+├── package.json             # 项目配置
+├── tsconfig.json            # TypeScript 配置
+├── vite.config.ts           # Vite 配置
+├── tailwind.config.js       # Tailwind 配置
+└── postcss.config.js        # PostCSS 配置
 ```
 
-## 🚀 启动命令
+## 快速开始
+
+### 安装依赖
 
 ```bash
-cd ~/workspace/project/frontend
 npm install
+```
+
+### 环境变量
+
+创建 `.env` 文件：
+
+```env
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+
+### 启动开发服务器
+
+```bash
 npm run dev
 ```
 
-访问：http://localhost:5173
+### 构建生产版本
 
-## 🔧 环境变量
-
-```env
-# API配置
-VITE_API_URL=http://localhost:3000/api/v1
-
-# 应用配置
-VITE_APP_TITLE=Agent任务管理系统
-VITE_APP_VERSION=1.0.0
+```bash
+npm run build
 ```
 
-## 📚 技术栈详情
+### 预览生产版本
 
-### 核心技术
-- **React 18**: 最新版本，支持并发特性
-- **TypeScript**: 完整类型定义
-- **Vite**: 快速开发构建工具
-- **Ant Design 5**: 企业级UI组件库
+```bash
+npm run preview
+```
+
+## 组件使用指南
+
+### 基础组件
+
+#### Button
+
+```tsx
+import Button from '@/components/Button';
+
+<Button variant="primary" size="md" loading={false}>
+  点击按钮
+</Button>
+```
+
+**Props:**
+- `variant`: 'primary' | 'secondary' | 'danger' | 'ghost'
+- `size`: 'sm' | 'md' | 'lg'
+- `loading`: boolean
+- `leftIcon`: React.ReactNode
+- `rightIcon`: React.ReactNode
+- `fullWidth`: boolean
+
+#### Input
+
+```tsx
+import Input from '@/components/Input';
+
+<Input
+  label="用户名"
+  placeholder="输入用户名"
+  value={value}
+  onChange={(e) => setValue(e.target.value)}
+  error="错误信息"
+  helperText="帮助文本"
+/>
+```
+
+#### PasswordInput
+
+```tsx
+import PasswordInput from '@/components/PasswordInput';
+
+<PasswordInput
+  label="密码"
+  placeholder="输入密码"
+  value={password}
+  onChange={(e) => setPassword(e.target.value)}
+  showToggle
+/>
+```
+
+#### Modal
+
+```tsx
+import Modal from '@/components/Modal';
+
+<Modal
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="标题"
+  footer={
+    <>
+      <Button variant="secondary" onClick={() => setIsOpen(false)}>
+        取消
+      </Button>
+      <Button onClick={handleConfirm}>
+        确认
+      </Button>
+    </>
+  }
+>
+  内容
+</Modal>
+```
 
 ### 状态管理
-- **Zustand**: 轻量级状态管理库
-  - 优点：简单、高效、无样板代码
-  - 适合：中小型应用
-  - 使用场景：用户认证、任务状态
 
-### HTTP客户端
-- **Axios**: Promise based HTTP client
-  - 请求拦截器：自动添加Token
-  - 响应拦截器：ETag自动处理、错误处理
-  - 优势：支持ETag、拦截器
+#### 使用 AuthStore
 
-### 路由
-- **React Router v6**: 最新版本
-  - 路由守卫：保护需要认证的页面
-  - 嵌套路由：布局组件 + 子路由
-  - 动态路由：任务详情页（/tasks/:id）
+```tsx
+import { useAuthStore } from '@/stores/authStore';
 
-## 🎯 技术亮点
+function MyComponent() {
+  const { user, isAuthenticated, login, logout } = useAuthStore();
 
-### 1. ETag缓存机制
-```typescript
-// 自动保存和使用ETag
-api.interceptors.response.use((response) => {
-  if (response.headers.etag) {
-    localStorage.setItem(`etag:${response.config.url}`, response.headers.etag);
-  }
-  return response;
-});
-```
-**优点**：
-- 减少不必要的数据传输
-- 节省带宽
-- 提高响应速度
+  const handleLogin = async () => {
+    await login('username', 'password', true);
+  };
 
-### 2. 轮询优化
-```typescript
-// 后台暂停轮询
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    clearInterval(pollTimer); // 后台：暂停
-  } else {
-    startPolling(); // 前台：恢复
-  }
-});
-```
-**优点**：
-- 节省资源（后台不轮询）
-- 提高性能
-- 减少服务器压力
-
-### 3. TypeScript类型安全
-```typescript
-interface Task {
-  id: number;
-  title: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'accepted' | 'rejected';
-  // ... 完整类型定义
+  return (
+    <div>
+      {isAuthenticated ? (
+        <div>欢迎, {user?.username}</div>
+      ) : (
+        <button onClick={handleLogin}>登录</button>
+      )}
+    </div>
+  );
 }
 ```
-**优点**：
-- 编译时类型检查
-- IDE智能提示
-- 减少运行时错误
 
-### 4. 响应式布局
-```typescript
-<Col xs={24} sm={12} md={6}>
-  {/* 移动端：1列，平板：2列，桌面：4列 */}
-</Col>
+#### 使用 AgentStore
+
+```tsx
+import { useAgentStore } from '@/stores/agentStore';
+
+function AgentList() {
+  const { agents, isLoading, loadAgents } = useAgentStore();
+
+  useEffect(() => {
+    loadAgents({ page: 1, pageSize: 20 });
+  }, []);
+
+  if (isLoading) return <div>加载中...</div>;
+
+  return (
+    <div>
+      {agents.map(agent => (
+        <div key={agent.id}>{agent.name}</div>
+      ))}
+    </div>
+  );
+}
 ```
-**优点**：
-- 移动端友好
-- 自适应不同屏幕
-- 提升用户体验
 
-## 📊 性能指标
+### API 调用
 
-- **首屏加载**: < 2s
-- **路由切换**: < 100ms
-- **API响应**: < 500ms（本地）
-- **轮询间隔**: 30s
-- **ETag命中率**: > 80%（预期）
+#### 使用 AgentService
 
-## 🔄 下一步计划
+```tsx
+import AgentService from '@/services/agentService';
 
-### Week 2（待后端API完成）
+// 获取 Agent 列表
+const agents = await AgentService.getAgents({ page: 1, pageSize: 20 });
 
-#### 1. 前后端联调（3月7日）
-- [ ] 连接后端API
-- [ ] 测试登录功能
-- [ ] 测试任务CRUD
-- [ ] 测试轮询机制
-- [ ] 修复集成问题
+// 生成 Token
+const { token } = await AgentService.generateToken(agentId);
 
-#### 2. 功能优化
-- [ ] 任务拖拽功能
-- [ ] 任务搜索
-- [ ] 任务筛选增强
-- [ ] 附件上传
-- [ ] 评论回复
+// 撤销 Token
+await AgentService.revokeToken(agentId);
+```
 
-#### 3. 性能优化
-- [ ] 代码分割
-- [ ] 懒加载
-- [ ] 图片优化
-- [ ] 缓存优化
+#### 使用 AuthService
 
-#### 4. 测试
-- [ ] 单元测试
-- [ ] 集成测试
-- [ ] E2E测试
+```tsx
+import AuthService from '@/services/authService';
 
-## 👥 开发团队
+// 登录
+const response = await AuthService.login({
+  username: 'admin@example.com',
+  password: 'password',
+  rememberMe: true,
+});
 
-- **前端开发**: @claw2-dev2
-- **技术Review**: @claw2-architect ✅
-- **项目管理**: @claw2-boss
+// 登出
+await AuthService.logout();
 
-## 📝 更新日志
+// 获取当前用户
+const user = await AuthService.getCurrentUser();
+```
 
-### v1.0.0 (2026-03-03)
-- ✅ 完成Week 1全部前端任务
-- ✅ 5个页面全部完成
-- ✅ 核心功能实现
-- ✅ 技术Review通过
-- ✅ 提前6天19小时完成
+### 工具函数
 
-## 📄 许可证
+#### 格式化函数
+
+```tsx
+import { formatRelativeTime, formatDateTime, formatLoadRate } from '@/utils/format';
+
+// 相对时间
+formatRelativeTime('2026-03-06T10:00:00Z'); // "2小时前"
+
+// 格式化日期时间
+formatDateTime('2026-03-06T10:00:00Z'); // "2026-03-06 10:00:00"
+
+// 格式化负载率
+formatLoadRate(3, 5); // 60
+```
+
+#### 验证函数
+
+```tsx
+import { validatePassword, validateEmail } from '@/utils/validation';
+
+// 验证密码强度
+const validation = validatePassword('Password123!');
+console.log(validation.strength); // 'strong'
+console.log(validation.isValid); // true
+
+// 验证邮箱
+validateEmail('admin@example.com'); // true
+```
+
+### 自定义 Hooks
+
+#### useToast
+
+```tsx
+import { useToast } from '@/hooks/useToast';
+
+function MyComponent() {
+  const { showToast } = useToast();
+
+  const handleClick = () => {
+    showToast('操作成功', 'success');
+    showToast('操作失败', 'error');
+    showToast('警告信息', 'warning');
+  };
+
+  return <button onClick={handleClick}>显示 Toast</button>;
+}
+```
+
+#### useDebounce
+
+```tsx
+import { useDebounce } from '@/hooks/useDebounce';
+
+function SearchInput() {
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  useEffect(() => {
+    // 使用防抖后的搜索词
+    search(debouncedSearchTerm);
+  }, [debouncedSearchTerm]);
+
+  return (
+    <input
+      value={searchTerm}
+      onChange={(e) => setSearchTerm(e.target.value)}
+    />
+  );
+}
+```
+
+## 样式规范
+
+### Tailwind CSS
+
+项目使用 Tailwind CSS 作为样式框架，遵循以下规范：
+
+- 使用 `@/utils/cn` 函数合并类名
+- 优先使用 Tailwind 的工具类
+- 避免在组件中写内联样式
+- 使用语义化的颜色和间距
+
+### 颜色规范
+
+```tsx
+// 主色
+bg-blue-500 text-white hover:bg-blue-600
+
+// 状态色
+bg-green-500 text-white  // 成功
+bg-red-500 text-white    // 错误
+bg-yellow-500 text-white // 警告
+bg-gray-500 text-white   // 信息
+```
+
+### 间距规范
+
+```tsx
+// 基于四像素网格
+p-1 (4px)
+p-2 (8px)
+p-3 (12px)
+p-4 (16px)
+p-6 (24px)
+p-8 (32px)
+```
+
+## 开发规范
+
+### 代码规范
+
+- 使用 TypeScript 进行类型检查
+- 遵循 ESLint 和 Prettier 规则
+- 组件命名使用 PascalCase
+- 函数命名使用 camelCase
+- 常量命名使用 UPPER_SNAKE_CASE
+
+### Git 提交规范
+
+```
+feat: 新功能
+fix: 修复bug
+docs: 文档更新
+style: 代码格式（不影响功能）
+refactor: 重构
+test: 测试相关
+chore: 构建/工具相关
+```
+
+### 组件开发规范
+
+1. 组件应该是纯函数或使用 React Hooks
+2. 使用 TypeScript 定义 Props 类型
+3. 组件应该是可复用的
+4. 避免过度嵌套
+5. 使用 memo 和 useMemo 优化性能
+
+## 测试
+
+### 运行测试
+
+```bash
+npm run test
+```
+
+### 测试覆盖率
+
+```bash
+npm run test:coverage
+```
+
+## 部署
+
+### 构建
+
+```bash
+npm run build
+```
+
+构建产物在 `dist` 目录中。
+
+### 部署到生产环境
+
+将 `dist` 目录部署到静态文件服务器或 CDN。
+
+## 相关文档
+
+- [V5.0 UI设计文档](../../workspace-ui/design/v5/)
+- [V5.0 PRD](../../workspace-main/team-docs/requirements/v5/)
+- [Tailwind CSS 文档](https://tailwindcss.com/docs)
+- [React 文档](https://react.dev/)
+- [TypeScript 文档](https://www.typescriptlang.org/docs/)
+
+## 许可证
 
 MIT
-
----
-
-**开发者**: @claw2-dev2  
-**完成时间**: 2026-03-03 02:20  
-**用时**: 41分钟  
-**状态**: ✅ 完成 + Review通过

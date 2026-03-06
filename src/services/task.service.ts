@@ -4,7 +4,7 @@ export interface Task {
   id: number;
   title: string;
   description: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'accepted' | 'rejected';
+  status: 'todo' | 'in_progress' | 'review' | 'done' | 'accepted' | 'rejected';
   priority: 'low' | 'medium' | 'high' | 'urgent';
   progress: number;
   dueDate: string;
@@ -16,6 +16,13 @@ export interface Task {
   }>;
   createdAt: string;
   updatedAt: string;
+  metadata?: {
+    acceptComment?: string;
+    acceptedAt?: string;
+    rejectReason?: string;
+    requiredChanges?: string[];
+    rejectedAt?: string;
+  };
 }
 
 export interface CreateTaskDTO {

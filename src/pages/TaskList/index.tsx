@@ -100,10 +100,12 @@ const TaskList: React.FC = () => {
   };
 
   const columns = [
-    { status: 'pending', title: '待办' },
+    { status: 'todo', title: '待办' },
     { status: 'in_progress', title: '进行中' },
-    { status: 'completed', title: '已完成' },
+    { status: 'review', title: '待验收' },
+    { status: 'done', title: '已完成' },
     { status: 'accepted', title: '已验收' },
+    { status: 'rejected', title: '已驳回' },
   ];
 
   const getTasksByStatus = (status: string) => {

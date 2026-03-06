@@ -1,41 +1,36 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer utilities {
+  .animate-wave {
+    @apply animate-pulse;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-#root {
-  min-height: 100vh;
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
 }
 
-/* 覆盖Ant Design默认样式 */
-.ant-layout {
-  min-height: 100vh;
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full;
 }
 
-.ant-card {
-  transition: all 0.3s ease;
-}
-
-.ant-card:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* 延期任务高亮 */
-.overdue {
-  border-color: #ff4d4f;
-  background: #fff1f0;
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-400;
 }

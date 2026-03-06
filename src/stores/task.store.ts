@@ -1,21 +1,7 @@
 import { create } from 'zustand';
+import { Task as TaskType } from '../services/task.service';
 
-interface Task {
-  id: number;
-  title: string;
-  description: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'accepted' | 'rejected';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  progress: number;
-  dueDate: string;
-  assignments: Array<{
-    agentId: number;
-    agentName: string;
-    role: string;
-  }>;
-  createdAt: string;
-  updatedAt: string;
-}
+type Task = Omit<TaskType, 'categoryId'>;
 
 interface TaskState {
   tasks: Task[];

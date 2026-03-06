@@ -1,7 +1,7 @@
 import api from './api';
 
 export interface Agent {
-  id: number;
+  id: string;
   name: string;
   type: 'developer' | 'tester' | 'designer' | 'manager';
   status: 'online' | 'offline' | 'busy';
@@ -10,6 +10,9 @@ export interface Agent {
   currentTaskCount: number;
   lastHeartbeatAt: string;
   createdAt: string;
+  apiToken?: string;
+  tokenCreatedAt?: string;
+  tokenExpiresAt?: string;
 }
 
 export const agentService = {
@@ -32,9 +35,10 @@ export const agentService = {
   createAgent: async (data: {
     name: string;
     type: string;
+    description?: string;
     capabilities: string[];
     maxConcurrentTasks: number;
-  }): Promise<Agent> => {
+  }): Promise<{ success: boolean; data: Agent; timestamp: string }> => {
     const response = await api.post('/agents', data);
     return response.data;
   },
@@ -48,5 +52,17 @@ export const agentService = {
   // 删除Agent
   deleteAgent: async (id: number): Promise<void> => {
     await api.delete(`/agents/${id}`);
+  },
+
+  // 重新生成Token
+  regenerateToken: async (id: number): Promise<{ success: boolean; data: { apiToken: string } }> => {
+    const response = await api.post(`/agents/${id}/regenerate-token`);
+    return response.data;
+  },
+
+  // 撤销Token
+  revokeToken: async (id: number): Promise<{ success: boolean }> => {
+    const response = await api.post(`/agents/${id}/revoke-token`);
+    return response.data;
   },
 };

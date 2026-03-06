@@ -9,14 +9,17 @@ import {
   Statistic,
   Row,
   Col,
+  Button,
 } from 'antd';
-import { TeamOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { TeamOutlined, UserOutlined, ClockCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { agentService, Agent } from '../../services/agent.service';
 import { formatDate } from '../../utils/storage';
+import { useNavigate } from 'react-router-dom';
 
 const { Option } = Select;
 
 const AgentList: React.FC = () => {
+  const navigate = useNavigate();
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
@@ -143,7 +146,16 @@ const AgentList: React.FC = () => {
 
   return (
     <div>
-      <h1 style={{ marginBottom: 24 }}>Agent列表</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <h1 style={{ margin: 0 }}>Agent列表</h1>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() => navigate('/agents/create')}
+        >
+          创建Agent
+        </Button>
+      </div>
 
       {/* 统计卡片 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
@@ -236,6 +248,10 @@ const AgentList: React.FC = () => {
             showSizeChanger: true,
             showTotal: (total) => `共 ${total} 个Agent`,
           }}
+          onRow={(record) => ({
+            onClick: () => navigate(`/agents/${record.id}`),
+            style: { cursor: 'pointer' },
+          })}
         />
       </Card>
     </div>

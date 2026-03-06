@@ -7,7 +7,7 @@ describe('useTaskStore', () => {
     id: 1,
     title: 'Test Task',
     description: 'Test Description',
-    status: 'pending',
+    status: 'todo',
     priority: 'medium',
     progress: 0,
     dueDate: '2026-03-03T10:00:00.000Z',
