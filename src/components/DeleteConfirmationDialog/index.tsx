@@ -1,8 +1,10 @@
+/**
+ * 删除确认弹窗组件
+ */
 import React from 'react';
-import { Modal, Button, Typography } from 'antd';
-import { ExclamationCircleOutlined, WarningOutlined } from '@ant-design/icons';
-
-const { Text } = Typography;
+import { AlertTriangle } from 'lucide-react';
+import { Modal } from '@/components/Modal';
+import { Button } from '@/components/Button';
 
 export interface DeleteConfirmationDialogProps {
   visible: boolean;
@@ -23,117 +25,65 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
 }) => {
   return (
     <Modal
-      open={visible}
-      onCancel={onCancel}
-      footer={null}
-      width={480}
-      centered
-      closable={false}
-      mask={{ closable: false }}
-    >
-      {/* 标题区域 */}
-      <div
-        style={{
-          padding: '16px 0',
-          borderBottom: '1px solid #F0F0F0',
-          marginBottom: '24px',
-        }}
-      >
-        <WarningOutlined
-          style={{
-            fontSize: '20px',
-            color: '#FA8C16',
-            marginRight: '8px',
-          }}
-        />
-        <span
-          style={{
-            fontSize: '16px',
-            fontWeight: 'bold',
-            color: '#FA8C16',
-          }}
-        >
-          确认删除
-        </span>
-      </div>
-
-      {/* 内容区域 */}
-      <div style={{ marginBottom: '24px' }}>
-        <Text
-          style={{ fontSize: '14px', display: 'block', marginBottom: '16px' }}
-        >
-          您确定要删除任务吗？
-        </Text>
-
-        <div
-          style={{
-            padding: '12px',
-            background: '#F5F5F5',
-            borderRadius: '4px',
-            marginBottom: '16px',
-          }}
-        >
-          <Text
-            style={{ fontSize: '14px', display: 'block', marginBottom: '8px' }}
+      isOpen={visible}
+      onClose={onCancel}
+      title=""
+      showCloseButton={false}
+      closeOnOverlayClick={false}
+      size="md"
+      footer={
+        <div className="flex justify-end gap-3">
+          <Button
+            variant="secondary"
+            onClick={onCancel}
+            disabled={loading}
           >
-            <strong>任务标题：</strong>
-            {taskTitle}
-          </Text>
-          <Text style={{ fontSize: '14px', display: 'block' }}>
-            <strong>任务ID：</strong>
-            {taskId}
-          </Text>
+            取消
+          </Button>
+          <Button
+            variant="danger"
+            onClick={onConfirm}
+            disabled={loading}
+            className="min-w-[100px]"
+          >
+            {loading ? '删除中...' : '确认删除'}
+          </Button>
         </div>
-
-        <div
-          style={{
-            padding: '12px',
-            background: '#FFF7E6',
-            borderRadius: '4px',
-            border: '1px solid #FFD591',
-          }}
-        >
-          <ExclamationCircleOutlined
-            style={{
-              color: '#FA8C16',
-              marginRight: '8px',
-            }}
-          />
-          <Text style={{ fontSize: '14px', color: '#FA8C16' }}>
-            此操作不可恢复
-          </Text>
+      }
+    >
+      {/* 图标和标题 */}
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+          <AlertTriangle className="h-6 w-6 text-orange-600" />
         </div>
+        <h3 className="text-lg font-semibold text-orange-600">
+          确认删除
+        </h3>
       </div>
 
-      {/* 按钮区域 */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          gap: '12px',
-        }}
-      >
-        <Button
-          onClick={onCancel}
-          style={{ width: '88px', height: '32px' }}
-          disabled={loading}
-        >
-          取消
-        </Button>
-        <Button
-          type="primary"
-          danger
-          onClick={onConfirm}
-          loading={loading}
-          style={{
-            width: '100px',
-            height: '32px',
-            background: '#FF4D4F',
-            borderColor: '#FF4D4F',
-          }}
-        >
-          确认删除
-        </Button>
+      {/* 内容 */}
+      <div className="space-y-4">
+        <p className="text-gray-700">您确定要删除任务吗？</p>
+
+        {/* 任务信息 */}
+        <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+          <div className="text-sm text-gray-600">
+            <span className="font-medium text-gray-900">任务标题：</span>
+            {taskTitle}
+          </div>
+          <div className="text-sm text-gray-600">
+            <span className="font-medium text-gray-900">任务ID：</span>
+            {taskId}
+          </div>
+        </div>
+
+        {/* 警告提示 */}
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-orange-700 font-medium">
+            此操作不可恢复
+          </p>
+        </div>
       </div>
     </Modal>
   );
