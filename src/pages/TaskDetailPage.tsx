@@ -7,6 +7,7 @@ import { useTaskStore } from '@/stores/taskStore';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { StatusBadge } from '@/components/StatusBadge';
+import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
 import {
   ArrowLeft,
   Edit,
@@ -38,6 +39,11 @@ const TaskDetailPage: React.FC = () => {
   } = useTaskStore();
 
   const [commentInput, setCommentInput] = useState('');
+  
+  // 删除确认弹窗状态
+  const [deleteTaskDialogOpen, setDeleteTaskDialogOpen] = useState(false);
+  const [deleteCommentDialogOpen, setDeleteCommentDialogOpen] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -52,15 +58,8 @@ const TaskDetailPage: React.FC = () => {
   };
 
   const handleDeleteTask = async () => {
-    if (window.confirm('确定要删除此任务吗？')) {
-      try {
-        await useTaskStore.getState().deleteTask(id!);
-        navigate('/tasks');
-      } catch (error) {
-        console.error('删除任务失败:', error);
-        alert('删除任务失败，请重试');
-      }
-    }
+    if (!currentTask) return;
+    setDeleteTaskDialogOpen(true);
   };
 
   const handleSubmitComment = async (e: React.FormEvent) => {
@@ -80,11 +79,30 @@ const TaskDetailPage: React.FC = () => {
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (!window.confirm('确定要删除此评论吗？')) return;
-    if (!id) return;
+    setCommentToDelete(commentId);
+    setDeleteCommentDialogOpen(true);
+  };
 
+  const confirmDeleteTask = async () => {
+    if (!id) return;
+    
     try {
-      await deleteComment(id, commentId);
+      await useTaskStore.getState().deleteTask(id);
+      setDeleteTaskDialogOpen(false);
+      navigate('/tasks');
+    } catch (error) {
+      console.error('删除任务失败:', error);
+      alert('删除任务失败，请重试');
+    }
+  };
+
+  const confirmDeleteComment = async () => {
+    if (!id || !commentToDelete) return;
+    
+    try {
+      await deleteComment(id, commentToDelete);
+      setDeleteCommentDialogOpen(false);
+      setCommentToDelete(null);
       loadComments(id);
     } catch (error) {
       console.error('删除评论失败:', error);
@@ -398,6 +416,33 @@ const TaskDetailPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* 删除确认弹窗 */}
+      <DeleteConfirmationDialog
+        isOpen={deleteTaskDialogOpen}
+        onClose={() => setDeleteTaskDialogOpen(false)}
+        onConfirm={confirmDeleteTask}
+        title="确认删除任务"
+        message="确定要删除此任务吗？"
+        itemInfo={currentTask ? [
+          { label: '任务标题', value: currentTask.title },
+          { label: '任务ID', value: currentTask.id }
+        ] : undefined}
+      />
+
+      <DeleteConfirmationDialog
+        isOpen={deleteCommentDialogOpen}
+        onClose={() => {
+          setDeleteCommentDialogOpen(false);
+          setCommentToDelete(null);
+        }}
+        onConfirm={confirmDeleteComment}
+        title="确认删除评论"
+        message="确定要删除此评论吗？"
+        itemInfo={commentToDelete ? [
+          { label: '评论ID', value: commentToDelete }
+        ] : undefined}
+      />
     </div>
   );
 };
