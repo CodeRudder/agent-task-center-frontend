@@ -1,5 +1,5 @@
 /**
- * Task状态管理
+ * Task状态管理（P1-6 状态流转优化更新版）
  */
 import { create } from 'zustand';
 import {
@@ -10,8 +10,32 @@ import {
   PaginatedResponse,
   TaskFilters,
   TaskSorting,
+  StatusHistoryItem,
+  TaskStatus,
 } from '@/types/task';
 import TaskService from '@/services/taskService';
+
+/**
+ * 状态流转规则定义
+ * 定义每个状态可以流转到的下一个状态列表
+ */
+const TRANSITION_RULES: Record<TaskStatus, TaskStatus[]> = {
+  todo: ['in_progress'],
+  in_progress: ['review', 'blocked', 'todo'],
+  review: ['done', 'in_progress'],
+  blocked: ['in_progress'],
+  done: ['in_progress'],
+};
+
+/**
+ * 需要填写原因的状态流转
+ */
+const REQUIRE_REASON_TRANSITIONS: Array<[TaskStatus, TaskStatus]> = [
+  ['in_progress', 'blocked'],
+  ['in_progress', 'todo'],
+  ['review', 'in_progress'],
+  ['done', 'in_progress'],
+];
 
 interface TaskState {
   // 状态
@@ -21,6 +45,7 @@ interface TaskState {
   comments: TaskComment[];
   attachments: TaskAttachment[];
   history: TaskHistory[];
+  statusHistories: StatusHistoryItem[]; // 新增：状态变更历史
   statistics: any;
   isLoading: boolean;
   error: string | null;
@@ -33,7 +58,7 @@ interface TaskState {
   filters: TaskFilters;
   sorting: TaskSorting;
 
-  // Actions
+  // 原有Actions
   loadTasks: (
     filters?: TaskFilters,
     sorting?: TaskSorting,
@@ -63,6 +88,12 @@ interface TaskState {
   setFilters: (filters: TaskFilters) => void;
   setSorting: (sorting: TaskSorting) => void;
   clearError: () => void;
+
+  // 新增：状态流转相关Actions
+  updateTaskStatus: (taskId: string, status: TaskStatus, reason?: string) => Promise<Task>;
+  getStatusHistories: (taskId: string, page?: number, limit?: number) => Promise<StatusHistoryItem[]>;
+  getNextStatuses: (currentStatus: TaskStatus) => TaskStatus[];
+  requireReason: (fromStatus: TaskStatus, toStatus: TaskStatus) => boolean;
 }
 
 export const useTaskStore = create<TaskState>((set, get) => ({
@@ -73,6 +104,7 @@ export const useTaskStore = create<TaskState>((set, get) => ({
   comments: [],
   attachments: [],
   history: [],
+  statusHistories: [], // 新增初始状态
   statistics: null,
   isLoading: false,
   error: null,
@@ -405,6 +437,88 @@ export const useTaskStore = create<TaskState>((set, get) => ({
       throw error;
     }
   },
+
+  // ==================== 新增：状态流转相关Actions ====================
+
+  /**
+   * 更新任务状态
+   * @param taskId 任务ID
+   * @param status 新状态
+   * @param reason 变更原因（某些流转必需）
+   */
+  updateTaskStatus: async (taskId: string, status: TaskStatus, reason?: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const updatedTask = await TaskService.updateTaskStatus(taskId, { status, reason });
+      
+      set((state) => ({
+        tasks: state.tasks.map((t) => 
+          t.id === taskId ? updatedTask : t
+        ),
+        currentTask: state.currentTask?.id === taskId 
+          ? updatedTask 
+          : state.currentTask,
+        isLoading: false,
+      }));
+      
+      return updatedTask;
+    } catch (error: any) {
+      set({
+        isLoading: false,
+        error: error.response?.data?.message || '更新任务状态失败',
+      });
+      throw error;
+    }
+  },
+
+  /**
+   * 获取任务状态变更历史
+   * @param taskId 任务ID
+   * @param page 页码，默认1
+   * @param limit 每页数量，默认20
+   */
+  getStatusHistories: async (taskId: string, page = 1, limit = 20) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await TaskService.getStatusHistories(taskId, page, limit);
+      
+      set({
+        statusHistories: response.items,
+        isLoading: false,
+      });
+      
+      return response.items;
+    } catch (error: any) {
+      set({
+        isLoading: false,
+        error: error.response?.data?.message || '加载状态历史失败',
+      });
+      throw error;
+    }
+  },
+
+  /**
+   * 获取允许流转的下一个状态列表
+   * @param currentStatus 当前状态
+   * @returns 允许的状态列表
+   */
+  getNextStatuses: (currentStatus: TaskStatus): TaskStatus[] => {
+    return TRANSITION_RULES[currentStatus] || [];
+  },
+
+  /**
+   * 检查状态流转是否需要填写原因
+   * @param fromStatus 起始状态
+   * @param toStatus 目标状态
+   * @returns 是否需要填写原因
+   */
+  requireReason: (fromStatus: TaskStatus, toStatus: TaskStatus): boolean => {
+    return REQUIRE_REASON_TRANSITIONS.some(
+      ([from, to]) => from === fromStatus && to === toStatus
+    );
+  },
+
+  // ================================================================
 
   // 切换任务选择状态
   toggleTaskSelection: (taskId: string) => {

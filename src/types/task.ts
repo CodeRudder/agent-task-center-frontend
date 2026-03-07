@@ -2,7 +2,15 @@
  * 任务相关类型定义
  */
 
-export type TaskStatus = 'todo' | 'in_progress' | 'completed' | 'cancelled';
+/**
+ * 任务状态枚举
+ * TODO: 待办
+ * IN_PROGRESS: 进行中
+ * REVIEW: 审核中
+ * DONE: 已完成
+ * BLOCKED: 已阻塞
+ */
+export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'done' | 'blocked';
 
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 
@@ -55,6 +63,39 @@ export interface TaskHistory {
   createdAt: string;
 }
 
+/**
+ * 状态变更历史项
+ */
+export interface StatusHistoryItem {
+  id: string;
+  taskId: string;
+  oldStatus: TaskStatus;
+  newStatus: TaskStatus;
+  changedBy: string;
+  changedByType: 'user' | 'agent';
+  changerName?: string;
+  reason?: string;
+  changedAt: string;
+}
+
+/**
+ * 更新任务状态请求参数
+ */
+export interface UpdateTaskStatusRequest {
+  status: TaskStatus;
+  reason?: string;
+}
+
+/**
+ * 获取状态历史响应
+ */
+export interface StatusHistoriesResponse {
+  items: StatusHistoryItem[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
 export interface TaskFilters {
   status?: TaskStatus;
   priority?: TaskPriority;
@@ -66,4 +107,15 @@ export interface TaskFilters {
 export interface TaskSorting {
   sortBy?: 'createdAt' | 'dueDate' | 'priority' | 'title';
   sortOrder?: 'asc' | 'desc';
+}
+
+/**
+ * 状态流转规则
+ */
+export interface StatusTransition {
+  from: TaskStatus;
+  to: TaskStatus;
+  allowed: boolean;
+  requireReason?: boolean;
+  description: string;
 }

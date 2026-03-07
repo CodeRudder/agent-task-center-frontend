@@ -10,6 +10,8 @@ import {
   PaginatedResponse,
   TaskFilters,
   TaskSorting,
+  UpdateTaskStatusRequest,
+  StatusHistoriesResponse,
 } from '@/types/task';
 
 export class TaskService {
@@ -172,6 +174,38 @@ export class TaskService {
     overdue: number;
   }> {
     const response = await apiClient.get('/tasks/statistics');
+    return response.data;
+  }
+
+  /**
+   * 更新任务状态（P1-6 状态流转优化）
+   * @param taskId 任务ID
+   * @param data 状态更新请求
+   * @returns 更新后的任务
+   */
+  static async updateTaskStatus(
+    taskId: string,
+    data: UpdateTaskStatusRequest
+  ): Promise<Task> {
+    const response = await apiClient.patch(`/tasks/${taskId}/status`, data);
+    return response.data;
+  }
+
+  /**
+   * 获取任务状态变更历史（P1-6 状态流转优化）
+   * @param taskId 任务ID
+   * @param page 页码，默认1
+   * @param limit 每页数量，默认20
+   * @returns 状态历史列表
+   */
+  static async getStatusHistories(
+    taskId: string,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<StatusHistoriesResponse> {
+    const response = await apiClient.get(`/tasks/${taskId}/status-histories`, {
+      params: { page, limit },
+    });
     return response.data;
   }
 }
