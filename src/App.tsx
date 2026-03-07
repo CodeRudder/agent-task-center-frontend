@@ -33,8 +33,6 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 function App() {
-  const { isAuthenticated } = useAuthStore();
-
   return (
     <BrowserRouter>
       <ToastContainer

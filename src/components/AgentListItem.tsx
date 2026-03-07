@@ -2,8 +2,8 @@
  * Agent 列表项组件
  */
 import React from 'react';
-import { Robot, MoreVertical } from 'lucide-react';
-import { Agent, TokenStatus, AgentStatus } from '@/types';
+import { Bot, MoreVertical } from 'lucide-react';
+import { Agent, TokenStatus, AgentStatus } from '@/types/agent';
 import { cn } from '@/utils/cn';
 import { formatRelativeTime, formatLoadRate } from '@/utils/format';
 import StatusBadge from './StatusBadge';
@@ -63,7 +63,7 @@ export const AgentListItem: React.FC<AgentListItemProps> = ({
       {/* Agent信息 */}
       <div className="flex-1 flex items-center gap-3 min-w-0">
         <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-          <Robot className="h-5 w-5 text-blue-600" />
+          <Bot className="h-5 w-5 text-blue-600" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">

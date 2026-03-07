@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import TaskCard from '../index';
 import { Task } from '../../../services/task.service';
 
@@ -15,7 +15,6 @@ const mockTask: Task = {
   createdAt: '2024-01-01T00:00:00Z',
   updatedAt: '2024-01-01T00:00:00Z',
   assignments: [],
-  tags: [],
 };
 
 describe('TaskCard', () => {
@@ -195,8 +194,8 @@ describe('TaskCard', () => {
       const taskWithAssignments: Task = {
         ...mockTask,
         assignments: [
-          { agentId: 1, agentName: 'Agent 1' },
-          { agentId: 2, agentName: 'Agent 2' },
+          { agentId: 1, agentName: 'Agent 1', role: 'developer' },
+          { agentId: 2, agentName: 'Agent 2', role: 'tester' },
         ],
       };
 
