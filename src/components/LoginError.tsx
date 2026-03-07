@@ -2,8 +2,7 @@
  * 登录错误提示组件
  */
 import React from 'react';
-import { AlertCircle, Lock, RefreshCw } from 'lucide-react';
-import { cn } from '@/utils/cn';
+import { AlertCircle, Lock } from 'lucide-react';
 import { LoginAttempt } from '@/types';
 import Button from './Button';
 

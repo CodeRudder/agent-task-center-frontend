@@ -10,6 +10,11 @@ import {
   PaginatedResponse,
   FilterParams,
   PaginationParams,
+  AgentCapability,
+  AgentLoad,
+  AgentPerformance,
+  AgentLoadSummary,
+  ExtendedAgent,
 } from '@/types';
 
 export class AgentService {
@@ -24,10 +29,28 @@ export class AgentService {
   }
 
   /**
+   * 获取Agent列表（含负载信息）- V5.2 P0
+   */
+  static async getAgentsWithLoad(
+    params?: PaginationParams & FilterParams
+  ): Promise<PaginatedResponse<ExtendedAgent>> {
+    const response = await apiClient.get('/api/v1/agents', { params });
+    return response.data;
+  }
+
+  /**
    * 获取Agent详情
    */
   static async getAgent(id: string): Promise<Agent> {
     const response = await apiClient.get(`/admin/agents/${id}`);
+    return response.data;
+  }
+
+  /**
+   * 获取Agent详情（含能力标签）- V5.2 P0
+   */
+  static async getAgentDetails(id: string): Promise<ExtendedAgent> {
+    const response = await apiClient.get(`/api/v1/agents/${id}`);
     return response.data;
   }
 
@@ -109,6 +132,79 @@ export class AgentService {
    */
   static async getAgentStatistics(agentId: string): Promise<AgentStatistics> {
     const response = await apiClient.get(`/admin/agents/${agentId}/statistics`);
+    return response.data;
+  }
+
+  // ============ V5.2 P0 新增API ============
+
+  /**
+   * 获取Agent负载详情 - V5.2 P0
+   */
+  static async getAgentLoad(agentId: string): Promise<AgentLoad> {
+    const response = await apiClient.get(`/api/v1/agents/${agentId}/load`);
+    return response.data;
+  }
+
+  /**
+   * 获取负载汇总 - V5.2 P0
+   */
+  static async getLoadSummary(): Promise<AgentLoadSummary> {
+    const response = await apiClient.get('/api/v1/agents/load-summary');
+    return response.data;
+  }
+
+  /**
+   * 获取Agent表现统计 - V5.2 P0
+   */
+  static async getAgentPerformance(
+    agentId: string,
+    period: string = 'last_30_days'
+  ): Promise<AgentPerformance> {
+    const response = await apiClient.get(`/api/v1/agents/${agentId}/performance`, {
+      params: { period },
+    });
+    return response.data;
+  }
+
+  /**
+   * 获取Agent表现排行榜 - V5.2 P0
+   */
+  static async getPerformanceRanking(params?: {
+    period?: string;
+    sortBy?: 'completionRate' | 'onTimeRate' | 'avgCompletionTimeHours';
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<{ agents: Array<{ agent: ExtendedAgent; performance: AgentPerformance }> }> {
+    const response = await apiClient.get('/api/v1/agents/performance-ranking', { params });
+    return response.data;
+  }
+
+  /**
+   * 添加Agent能力标签 - V5.2 P0
+   */
+  static async addCapability(
+    agentId: string,
+    capability: string,
+    proficiency: number = 3
+  ): Promise<AgentCapability> {
+    const response = await apiClient.post(`/api/v1/agents/${agentId}/capabilities`, {
+      capability,
+      proficiency,
+    });
+    return response.data;
+  }
+
+  /**
+   * 删除Agent能力标签 - V5.2 P0
+   */
+  static async removeCapability(agentId: string, capId: string): Promise<void> {
+    await apiClient.delete(`/api/v1/agents/${agentId}/capabilities/${capId}`);
+  }
+
+  /**
+   * 获取Agent能力标签列表 - V5.2 P0
+   */
+  static async getCapabilities(agentId: string): Promise<AgentCapability[]> {
+    const response = await apiClient.get(`/api/v1/agents/${agentId}/capabilities`);
     return response.data;
   }
 }

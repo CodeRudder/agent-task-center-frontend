@@ -7,12 +7,19 @@ import {
   TaskComment,
   TaskAttachment,
   TaskHistory,
-  PaginatedResponse,
   TaskFilters,
   TaskSorting,
   UpdateTaskStatusRequest,
   StatusHistoriesResponse,
+  ExtendedTask,
+  SubTask,
+  TaskDependency,
+  SubTaskListResponse,
+  CreateSubTaskRequest,
+  TaskTreeNode,
+  SetDependenciesRequest,
 } from '@/types/task';
+import { PaginatedResponse } from '@/types/api';
 
 export class TaskService {
   /**
@@ -206,6 +213,77 @@ export class TaskService {
     const response = await apiClient.get(`/tasks/${taskId}/status-histories`, {
       params: { page, limit },
     });
+    return response.data;
+  }
+
+  // ============ V5.2 P0 新增API ============
+
+  /**
+   * 创建子任务 - V5.2 P0
+   */
+  static async createSubTask(
+    parentId: string,
+    data: CreateSubTaskRequest
+  ): Promise<SubTask> {
+    const response = await apiClient.post(`/api/v1/tasks/${parentId}/subtasks`, data);
+    return response.data;
+  }
+
+  /**
+   * 获取子任务列表 - V5.2 P0
+   */
+  static async getSubTasks(
+    parentId: string,
+    params?: { page?: number; pageSize?: number }
+  ): Promise<SubTaskListResponse> {
+    const response = await apiClient.get(`/api/v1/tasks/${parentId}/subtasks`, { params });
+    return response.data;
+  }
+
+  /**
+   * 获取任务树形结构 - V5.2 P0
+   */
+  static async getTaskTree(parentId?: string): Promise<TaskTreeNode[]> {
+    const params = parentId ? { parentId } : {};
+    const response = await apiClient.get('/api/v1/tasks/tree', { params });
+    return response.data;
+  }
+
+  /**
+   * 设置任务依赖关系 - V5.2 P0
+   */
+  static async setDependencies(
+    taskId: string,
+    data: SetDependenciesRequest
+  ): Promise<TaskDependency[]> {
+    const response = await apiClient.put(`/api/v1/tasks/${taskId}/dependencies`, data);
+    return response.data;
+  }
+
+  /**
+   * 获取任务依赖关系 - V5.2 P0
+   */
+  static async getDependencies(taskId: string): Promise<TaskDependency[]> {
+    const response = await apiClient.get(`/api/v1/tasks/${taskId}/dependencies`);
+    return response.data;
+  }
+
+  /**
+   * 删除任务依赖关系 - V5.2 P0
+   */
+  static async removeDependency(taskId: string, depId: string): Promise<void> {
+    await apiClient.delete(`/api/v1/tasks/${taskId}/dependencies/${depId}`);
+  }
+
+  /**
+   * 检测任务依赖关系（循环依赖检测）- V5.2 P0
+   */
+  static async checkDependencies(taskId: string): Promise<{
+    hasCycle: boolean;
+    cyclePath?: string[];
+    blockedBy?: string[];
+  }> {
+    const response = await apiClient.post(`/api/v1/tasks/${taskId}/check-dependencies`);
     return response.data;
   }
 }

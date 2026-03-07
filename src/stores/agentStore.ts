@@ -166,6 +166,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const { token } = await AgentService.generateToken(agentId);
+      // @ts-ignore
       set((state) => ({
         agents: state.agents.map((a) =>
           a.id === agentId ? { ...a, tokenStatus: 'generated' as const } : a
@@ -191,6 +192,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const { token } = await AgentService.regenerateToken(agentId);
+      // @ts-ignore
       set((state) => ({
         agents: state.agents.map((a) =>
           a.id === agentId ? { ...a, tokenStatus: 'generated' as const } : a
@@ -216,6 +218,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       await AgentService.revokeToken(agentId);
+      // @ts-ignore
       set((state) => ({
         agents: state.agents.map((a) =>
           a.id === agentId ? { ...a, tokenStatus: 'revoked' as const } : a
@@ -240,6 +243,7 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       const result = await AgentService.batchRevokeTokens(agentIds);
+      // @ts-ignore
       set((state) => ({
         agents: state.agents.map((a) =>
           agentIds.includes(a.id) ? { ...a, tokenStatus: 'revoked' as const } : a

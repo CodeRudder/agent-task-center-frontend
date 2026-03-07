@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 import TaskCard from '../../components/TaskCard';
 import { useTaskStore } from '../../stores/task.store';
 import { taskService, Task, CreateTaskDTO, UpdateTaskDTO } from '../../services/task.service';
-import { usePolling } from '../../hooks/usePolling';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -24,13 +23,13 @@ const TaskList: React.FC = () => {
   }, []);
 
   // 轮询更新任务（30秒间隔）
-  const { loading: pollingLoading } = usePolling<{ tasks: Task[]; total: number }>({
-    url: '/tasks',
-    interval: 30000,
-    enabled: true,
-  });
-
-  // 加载任务列表
+//   const { loading: pollingLoading } = usePolling<{ tasks: Task[]; total: number }>({
+//     url: '/tasks',
+//     interval: 30000,
+//     enabled: true,
+//   });
+// 
+//   // 加载任务列表
   const loadTasks = async () => {
     try {
       const response = await taskService.getTasks();

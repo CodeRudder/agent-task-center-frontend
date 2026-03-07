@@ -1,8 +1,8 @@
 /**
  * Token 管理页面
  */
-import React, { useEffect, useState } from 'react';
-import { Search, Filter, ArrowUpDown, RefreshCw, Download } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Search, RefreshCw } from 'lucide-react';
 import { useAgentStore } from '@/stores/agentStore';
 import { Agent, AgentStatus, AgentType } from '@/types';
 import { cn } from '@/utils/cn';
@@ -10,7 +10,6 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useToast } from '@/hooks/useToast';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
-import StatusBadge from '@/components/StatusBadge';
 import TokenDisplay from '@/components/TokenDisplay';
 import AgentListItem from '@/components/AgentListItem';
 import Modal from '@/components/Modal';
@@ -27,7 +26,6 @@ export default function TokenManagementPage() {
     toggleAgentSelection,
     toggleAllAgents,
     clearSelection,
-    setFilters,
     generateToken,
     regenerateToken,
     revokeToken,
@@ -104,7 +102,9 @@ export default function TokenManagementPage() {
     }
   };
 
-  const handleRevokeTokenClick = (agent: Agent) => {
+  const handleRevokeTokenClick = (agentId: string) => {
+    const agent = agents.find(a => a.id === agentId);
+    if (!agent) return;
     setAgentToRevoke(agent);
     setConfirmAgentName('');
     setShowRevokeConfirm(true);

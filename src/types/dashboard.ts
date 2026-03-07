@@ -44,7 +44,7 @@ export interface TaskStatistics {
 }
 
 // Agent运行状态
-export interface AgentStatus {
+export interface AgentRuntimeStatus {
   id: string;
   name: string;
   status: 'idle' | 'running' | 'error' | 'stopped';

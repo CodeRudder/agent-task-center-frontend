@@ -2,9 +2,8 @@
  * Axios API 客户端配置
  */
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
-import { ApiResponse } from '@/types/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const API_BASE_URL = (import.meta as any).env.VITE_API_BASE_URL || '/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -66,5 +65,37 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+/**
+ * 带ETag缓存的GET请求
+ */
+export const getWithETag = async <T = any>(
+  url: string,
+  config?: InternalAxiosRequestConfig
+): Promise<AxiosResponse<T>> => {
+  const etagKey = `etag:${url}`;
+  const storedEtag = localStorage.getItem(etagKey);
+
+  const requestConfig: InternalAxiosRequestConfig = {
+    ...config,
+  };
+
+  // 添加If-None-Match头
+  if (storedEtag) {
+    if (!requestConfig.headers) {
+      requestConfig.headers = {} as any;
+    }
+    (requestConfig.headers as any)['If-None-Match'] = storedEtag;
+  }
+
+  const response = await apiClient.get<T>(url, requestConfig);
+
+  // 如果返回新数据，存储ETag
+  if (response.status === 200 && response.headers['etag']) {
+    localStorage.setItem(etagKey, response.headers['etag']);
+  }
+
+  return response;
+};
 
 export default apiClient;

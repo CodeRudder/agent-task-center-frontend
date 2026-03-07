@@ -3,7 +3,7 @@
  */
 import React from 'react';
 import { Bot, MoreVertical } from 'lucide-react';
-import { Agent, TokenStatus, AgentStatus } from '@/types/agent';
+import { Agent, TokenStatus, AgentStatus } from '@/types';
 import { cn } from '@/utils/cn';
 import { formatRelativeTime, formatLoadRate } from '@/utils/format';
 import StatusBadge from './StatusBadge';

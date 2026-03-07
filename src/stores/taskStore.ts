@@ -7,12 +7,12 @@ import {
   TaskComment,
   TaskAttachment,
   TaskHistory,
-  PaginatedResponse,
   TaskFilters,
   TaskSorting,
   StatusHistoryItem,
   TaskStatus,
 } from '@/types/task';
+import { PaginatedResponse } from '@/types/api';
 import TaskService from '@/services/taskService';
 
 /**

@@ -31,6 +31,60 @@ export interface Task {
   completedAt?: string;
 }
 
+// V5.2 P0: 扩展任务类型以支持子任务
+export interface ExtendedTask extends Task {
+  parentId?: string;
+  subtaskCount?: number;
+  isBlockedByDependency?: boolean;
+  dependencyCount?: number;
+  progress?: number;
+}
+
+// V5.2 P0: 子任务
+export interface SubTask extends ExtendedTask {
+  parentId: string;
+  isBlocked: boolean;
+  dependencies: TaskDependency[];
+}
+
+// V5.2 P0: 任务依赖关系
+export interface TaskDependency {
+  id: string;
+  taskId: string;
+  dependsOnTaskId: string;
+  dependencyType: 'FS' | 'SS'; // FS: Finish-Start, SS: Start-Start
+  createdAt: string;
+}
+
+// V5.2 P0: 任务标签
+export interface TaskTag {
+  id: string;
+  taskId: string;
+  tagName: string;
+  tagColor: string;
+  createdAt: string;
+}
+
+// V5.2 P0: 子任务列表响应
+export interface SubTaskListResponse {
+  parentTask: ExtendedTask;
+  subtasks: SubTask[];
+  pagination: {
+    total: number;
+    page: number;
+    pageSize: number;
+  };
+}
+
+// V5.2 P0: 创建子任务请求
+export interface CreateSubTaskRequest {
+  title: string;
+  description?: string;
+  assigneeId?: string;
+  priority?: TaskPriority;
+  dueDate?: string;
+}
+
 export interface TaskComment {
   id: string;
   taskId: string;
@@ -102,6 +156,7 @@ export interface TaskFilters {
   assigneeId?: string;
   tags?: string[];
   search?: string;
+  parentId?: string; // V5.2 P0: 筛选子任务
 }
 
 export interface TaskSorting {
@@ -118,4 +173,26 @@ export interface StatusTransition {
   allowed: boolean;
   requireReason?: boolean;
   description: string;
+}
+
+// V5.2 P0: 树形结构任务节点
+export interface TaskTreeNode {
+  key: string;
+  title: string;
+  children?: TaskTreeNode[];
+  data: ExtendedTask;
+  isLeaf?: boolean;
+}
+
+// V5.2 P0: 任务依赖检测结果
+export interface DependencyCheckResult {
+  hasCycle: boolean;
+  cyclePath?: string[];
+  blockedBy?: string[];
+}
+
+// V5.2 P0: 设置依赖关系请求
+export interface SetDependenciesRequest {
+  dependsOnTaskIds: string[];
+  dependencyType?: 'FS' | 'SS';
 }

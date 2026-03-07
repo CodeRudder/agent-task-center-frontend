@@ -7,7 +7,6 @@ import { useAgentStore } from '@/stores/agentStore';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
-import { StatusBadge } from '@/components/StatusBadge';
 import { Modal } from '@/components/Modal';
 import TaskCreateModal from '@/components/TaskCreateModal';
 import TaskEditModal from '@/components/TaskEditModal';
@@ -29,14 +28,12 @@ const TaskListPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editTaskId, setEditTaskId] = useState<string | null>(null);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   
   // 删除确认弹窗状态
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<{ id: string; title: string } | null>(null);
   const [batchDeleteDialogOpen, setBatchDeleteDialogOpen] = useState(false);
   const [batchArchiveDialogOpen, setBatchArchiveDialogOpen] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const {
     tasks,
@@ -55,7 +52,7 @@ const TaskListPage: React.FC = () => {
     batchArchiveTasks,
   } = useTaskStore();
 
-  const { agents, loadAgents } = useAgentStore();
+  const { loadAgents } = useAgentStore();
 
   useEffect(() => {
     loadTasks();
@@ -158,8 +155,9 @@ const TaskListPage: React.FC = () => {
     const statusMap: Record<TaskStatus, string> = {
       todo: '待办',
       in_progress: '进行中',
-      completed: '已完成',
-      cancelled: '已取消',
+      done: '已完成',
+      review: '审核中',
+      blocked: '已阻塞',
     };
     return statusMap[status];
   };
@@ -168,8 +166,9 @@ const TaskListPage: React.FC = () => {
     const colorMap: Record<TaskStatus, string> = {
       todo: 'bg-gray-100 text-gray-800',
       in_progress: 'bg-blue-100 text-blue-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800',
+      done: 'bg-green-100 text-green-800',
+      review: 'bg-yellow-100 text-yellow-800',
+      blocked: 'bg-red-100 text-red-800',
     };
     return colorMap[status];
   };
@@ -234,7 +233,7 @@ const TaskListPage: React.FC = () => {
                 { value: 'todo', label: '待办' },
                 { value: 'in_progress', label: '进行中' },
                 { value: 'completed', label: '已完成' },
-                { value: 'cancelled', label: '已取消' },
+                { value: 'cancelled', label: '审核中' },
               ]}
               value={filters.status || 'all'}
               onChange={handleStatusFilter}
