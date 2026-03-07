@@ -5,6 +5,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTaskStore } from '@/stores/taskStore';
 import { Button } from '@/components/Button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/Select';
 import { Input } from '@/components/Input';
 import { StatusBadge } from '@/components/StatusBadge';
 import DeleteConfirmationDialog from '@/components/DeleteConfirmationDialog';
@@ -45,9 +52,63 @@ const TaskDetailPage: React.FC = () => {
   const [deleteCommentDialogOpen, setDeleteCommentDialogOpen] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
+  // 编辑模式状态
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    description: '',
+    status: 'todo' as TaskStatus,
+    priority: 'medium' as TaskPriority,
+    dueDate: '',
+  });
+  const [isSaving, setIsSaving] = useState(false);
+
+
   useEffect(() => {
     if (id) {
       loadTask(id);
+
+  const handleStartEdit = () => {
+    if (!currentTask) return;
+    
+    setEditFormData({
+      title: currentTask.title,
+      description: currentTask.description || '',
+      status: currentTask.status,
+      priority: currentTask.priority,
+      dueDate: currentTask.dueDate ? new Date(currentTask.dueDate).toISOString().split('T')[0] : '',
+    });
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!id || !currentTask) return;
+
+    setIsSaving(true);
+    try {
+      await useTaskStore.getState().updateTask(id, {
+        title: editFormData.title,
+        description: editFormData.description,
+        status: editFormData.status,
+        priority: editFormData.priority,
+        dueDate: editFormData.dueDate ? new Date(editFormData.dueDate).toISOString() : null,
+      });
+      
+      // 重新加载任务数据
+      await loadTask(id);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('保存任务失败:', error);
+      alert('保存任务失败，请重试');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
       loadComments(id);
       loadHistory(id);
     }
@@ -197,7 +258,7 @@ const TaskDetailPage: React.FC = () => {
             <Button
               variant="secondary"
               size="sm"
-              onClick={handleEditTask}
+              onClick={isEditing ? undefined : handleStartEdit}
               leftIcon={<Edit className="h-4 w-4" />}
             >
               编辑
@@ -221,6 +282,120 @@ const TaskDetailPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">任务描述</h2>
             <div className="text-gray-700 whitespace-pre-wrap">{currentTask.description}</div>
+
+          {/* 任务编辑表单 */}
+          {isEditing && (
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">编辑任务</h2>
+              
+              <div className="space-y-4">
+                {/* 任务标题 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    任务标题 <span className="text-red-500">*</span>
+                  </label>
+                  <Input
+                    type="text"
+                    value={editFormData.title}
+                    onChange={(e) => setEditFormData({...editFormData, title: e.target.value})}
+                    placeholder="请输入任务标题"
+                  />
+                </div>
+
+                {/* 任务描述 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    任务描述
+                  </label>
+                  <textarea
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
+                    value={editFormData.description}
+                    onChange={(e) => setEditFormData({...editFormData, description: e.target.value})}
+                    placeholder="请输入任务描述"
+                  />
+                </div>
+
+                {/* 状态和优先级 */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      状态
+                    </label>
+                    <Select
+                      value={editFormData.status}
+                      onValueChange={(value) => setEditFormData({...editFormData, status: value as TaskStatus})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">待办</SelectItem>
+                        <SelectItem value="in_progress">进行中</SelectItem>
+                        <SelectItem value="completed">已完成</SelectItem>
+                        <SelectItem value="cancelled">已取消</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      优先级
+                    </label>
+                    <Select
+                      value={editFormData.priority}
+                      onValueChange={(value) => setEditFormData({...editFormData, priority: value as TaskPriority})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">低</SelectItem>
+                        <SelectItem value="medium">中</SelectItem>
+                        <SelectItem value="high">高</SelectItem>
+                        <SelectItem value="urgent">紧急</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {/* 截止日期 */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    截止日期
+                  </label>
+                  <div className="relative">
+                    <Input
+                      type="date"
+                      value={editFormData.dueDate}
+                      onChange={(e) => setEditFormData({...editFormData, dueDate: e.target.value})}
+                    />
+                  </div>
+                </div>
+
+                {/* 操作按钮 */}
+                <div className="flex items-center justify-end gap-3 pt-4 border-t">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleCancelEdit}
+                    disabled={isSaving}
+                  >
+                    取消
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={handleSaveEdit}
+                    disabled={isSaving}
+                    className="min-w-[100px]"
+                  >
+                    {isSaving ? '保存中...' : '保存'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           </div>
 
           {/* 评论 */}
