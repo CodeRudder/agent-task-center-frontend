@@ -115,12 +115,16 @@ const TaskCard: React.FC<TaskCardProps> = ({
       {/* 删除确认弹窗 */}
       {onDelete && (
         <DeleteConfirmationDialog
-          visible={deleteDialogVisible}
-          taskTitle={task.title}
-          taskId={task.id}
-          onCancel={handleDeleteCancel}
+          isOpen={deleteDialogVisible}
+          title="确认删除任务"
+          message="确定要删除此任务吗？此操作不可恢复。"
+          onClose={handleDeleteCancel}
           onConfirm={handleDeleteConfirm}
-          loading={deleteLoading}
+          itemInfo={[
+            { label: '任务标题', value: task.title },
+            { label: '任务ID', value: task.id.toString() },
+          ]}
+          danger={true}
         />
       )}
     </>
