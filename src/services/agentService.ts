@@ -210,3 +210,25 @@ export class AgentService {
 }
 
 export default AgentService;
+
+  /**
+   * 验证Agent Token - V5.0 P0-1 (基于Dev1 f3b18f6修复)
+   * 使用 X-Agent-Token header（不是 Authorization: Bearer）
+   * 正确路径：/api/v1/agent/auth/verify
+   */
+  static async verifyAgentToken(): Promise<{
+    success: boolean;
+    data?: {
+      id: string;
+      name: string;
+      status: string;
+      role: string;
+      type: string;
+    };
+    message: string;
+  }> {
+    // 使用专用的agentApiClient（不是apiClient）
+    const agentApiClient = await import('./agentApi').then(m => m.default);
+    const response = await agentApiClient.get('/agent/auth/verify');
+    return response.data;
+  }

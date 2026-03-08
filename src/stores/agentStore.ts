@@ -327,6 +327,23 @@ export const useAgentStore = create<AgentState>((set, get) => ({
 
   // 清除错误
   clearError: () => {
+
+  // 验证Agent Token - V5.0 P0-1 (基于Dev1 f3b18f6修复)
+  verifyAgentToken: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const result = await AgentService.verifyAgentToken();
+      set({ isLoading: false });
+      return result;
+    } catch (error: any) {
+      set({
+        isLoading: false,
+        error: error.response?.data?.message || 'Token验证失败',
+      });
+      throw error;
+    }
+  },
+
     set({ error: null });
   },
 }));
