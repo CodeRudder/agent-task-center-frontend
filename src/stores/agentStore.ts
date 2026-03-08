@@ -327,6 +327,8 @@ export const useAgentStore = create<AgentState>((set, get) => ({
 
   // 清除错误
   clearError: () => {
+    set({ error: null });
+  },
 
   // 验证Agent Token - V5.0 P0-1 (基于Dev1 f3b18f6修复)
   verifyAgentToken: async () => {
@@ -344,8 +346,6 @@ export const useAgentStore = create<AgentState>((set, get) => ({
     }
   },
 
-    set({ error: null });
-  },
 }));
 
 export default useAgentStore;

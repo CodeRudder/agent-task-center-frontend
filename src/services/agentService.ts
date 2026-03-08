@@ -207,9 +207,7 @@ export class AgentService {
     const response = await apiClient.get(`/api/v1/agents/${agentId}/capabilities`);
     return response.data;
   }
-}
 
-export default AgentService;
 
   /**
    * 验证Agent Token - V5.0 P0-1 (基于Dev1 f3b18f6修复)
@@ -257,3 +255,5 @@ export default AgentService;
     return response.data;
   }
 }
+
+export default AgentService;
