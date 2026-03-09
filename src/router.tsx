@@ -5,6 +5,9 @@ import Dashboard from './pages/Dashboard';
 import TaskList from './pages/TaskList';
 import TaskDetail from './pages/TaskDetail';
 import AgentList from './pages/AgentList';
+import AgentCreate from './pages/AgentCreate';
+import AgentDetail from './pages/AgentDetail';
+import TaskTemplates from './pages/TaskTemplates';
 
 // 路由守卫组件
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
@@ -49,6 +52,18 @@ export const router = createBrowserRouter([
       {
         path: 'agents',
         element: <AgentList />,
+      },
+      {
+        path: 'agents/create',
+        element: <AgentCreate />,
+      },
+      {
+        path: 'agents/:id',
+        element: <AgentDetail />,
+      },
+      {
+        path: 'templates',
+        element: <TaskTemplates />,
       },
     ],
   },

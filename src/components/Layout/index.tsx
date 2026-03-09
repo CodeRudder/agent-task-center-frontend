@@ -6,6 +6,7 @@ import {
   TeamOutlined,
   UserOutlined,
   LogoutOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../stores/auth.store';
@@ -27,6 +28,11 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       key: '/tasks',
       icon: <TagsOutlined />,
       label: '任务管理',
+    },
+    {
+      key: '/templates',
+      icon: <FileTextOutlined />,
+      label: '任务模板',
     },
     {
       key: '/agents',

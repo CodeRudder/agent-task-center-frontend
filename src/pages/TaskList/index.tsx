@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, Button, Modal, Form, Input, Select, DatePicker, InputNumber, message, Space } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import TaskCard from '../../components/TaskCard';
 import { useTaskStore } from '../../stores/task.store';
 import { taskService, Task, CreateTaskDTO, UpdateTaskDTO } from '../../services/task.service';
-import { usePolling } from '../../hooks/usePolling';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -14,6 +14,7 @@ const TaskList: React.FC = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState<number | null>(null);
   const [form] = Form.useForm();
 
   // 初始加载任务
@@ -22,13 +23,13 @@ const TaskList: React.FC = () => {
   }, []);
 
   // 轮询更新任务（30秒间隔）
-  const { loading: pollingLoading } = usePolling<{ tasks: Task[]; total: number }>({
-    url: '/tasks',
-    interval: 30000,
-    enabled: true,
-  });
-
-  // 加载任务列表
+//   const { loading: pollingLoading } = usePolling<{ tasks: Task[]; total: number }>({
+//     url: '/tasks',
+//     interval: 30000,
+//     enabled: true,
+//   });
+// 
+//   // 加载任务列表
   const loadTasks = async () => {
     try {
       const response = await taskService.getTasks();
@@ -50,7 +51,7 @@ const TaskList: React.FC = () => {
     setEditingTask(task);
     form.setFieldsValue({
       ...task,
-      dueDate: new Date(task.dueDate),
+      dueDate: dayjs(task.dueDate),
     });
     setModalVisible(true);
   };
@@ -58,11 +59,14 @@ const TaskList: React.FC = () => {
   // 删除任务
   const handleDelete = async (id: number) => {
     try {
+      setDeleteLoading(id);
       await taskService.deleteTask(id);
       removeTask(id);
       message.success('删除成功');
     } catch (error) {
       message.error('删除失败');
+    } finally {
+      setDeleteLoading(null);
     }
   };
 
@@ -99,10 +103,12 @@ const TaskList: React.FC = () => {
   };
 
   const columns = [
-    { status: 'pending', title: '待办' },
+    { status: 'todo', title: '待办' },
     { status: 'in_progress', title: '进行中' },
-    { status: 'completed', title: '已完成' },
+    { status: 'review', title: '待验收' },
+    { status: 'done', title: '已完成' },
     { status: 'accepted', title: '已验收' },
+    { status: 'rejected', title: '已驳回' },
   ];
 
   const getTasksByStatus = (status: string) => {
@@ -146,6 +152,7 @@ const TaskList: React.FC = () => {
                     task={task}
                     onEdit={handleEdit}
                     onDelete={handleDelete}
+                    deleteLoading={deleteLoading === task.id}
                   />
                 ))}
               </div>
