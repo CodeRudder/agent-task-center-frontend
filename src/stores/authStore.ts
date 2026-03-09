@@ -44,9 +44,13 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await AuthService.login({ email, password });
 
-          // 保存Token
+          // 验证并保存Token
+          if (!response.accessToken || typeof response.accessToken !== 'string' || response.accessToken === 'undefined') {
+            throw new Error('登录失败：服务器未返回有效的访问令牌');
+          }
+
           localStorage.setItem('accessToken', response.accessToken);
-          if (rememberMe) {
+          if (rememberMe && response.refreshToken) {
             localStorage.setItem('refreshToken', response.refreshToken);
           }
 
@@ -57,7 +61,7 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           });
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || '登录失败';
+          const errorMessage = error.response?.data?.message || error.message || '登录失败';
           set({
             isLoading: false,
             error: errorMessage,

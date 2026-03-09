@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Form, Input, Button, Card, message, Checkbox } from 'antd';
 import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuthStore } from '../../stores/auth.store';
-import { authService, LoginDTO } from '../../services/auth.service';
+import { useAuthStore } from '../../stores/authStore';
+import { LoginDTO } from '../../services/auth.service';
 
 const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -24,11 +24,8 @@ const Login: React.FC = () => {
   const onFinish = async (values: LoginDTO) => {
     setLoading(true);
     try {
-      const response = await authService.login(values);
-      const { accessToken, user } = response;
-      
-      // 保存Token
-      login(user, accessToken);
+      // 使用authStore的login方法，它会自动处理所有逻辑
+      await login(values.email, values.password, rememberMe);
       
       // 记住邮箱
       if (rememberMe) {
