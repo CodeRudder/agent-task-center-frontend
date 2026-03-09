@@ -15,7 +15,7 @@ export default function LoginPage() {
   const { login, loginAttempts, checkLoginAttempts, error, clearError } = useAuthStore();
   const { showToast } = useToast();
 
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,15 +23,15 @@ export default function LoginPage() {
 
   // 检查登录尝试次数
   useEffect(() => {
-    if (username) {
-      checkLoginAttempts(username);
+    if (email) {
+      checkLoginAttempts(email);
     }
-  }, [username, checkLoginAttempts]);
+  }, [email, checkLoginAttempts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username || !password) {
+    if (!email || !password) {
       showToast('请输入用户名和密码', 'warning');
       return;
     }
@@ -46,14 +46,14 @@ export default function LoginPage() {
     clearError();
 
     try {
-      await login(username, password, rememberMe);
+      await login(email, password, rememberMe);
       showToast('登录成功', 'success');
       navigate('/');
     } catch (error: any) {
       setErrorType('invalid_credentials');
 
       // 重新检查登录尝试次数
-      await checkLoginAttempts(username);
+      await checkLoginAttempts(email);
     } finally {
       setIsLoading(false);
     }
@@ -107,8 +107,8 @@ export default function LoginPage() {
               label="用户名"
               type="email"
               placeholder="admin@example.com"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               disabled={isLoading || loginAttempts?.isLocked}
               autoComplete="username"
               autoFocus

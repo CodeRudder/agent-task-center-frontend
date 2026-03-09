@@ -53,8 +53,8 @@ export class AuthService {
   /**
    * 检查登录尝试次数
    */
-  static async checkLoginAttempts(username: string): Promise<LoginAttempt> {
-    const response = await apiClient.get('/auth/login-attempts', { params: { username } });
+  static async checkLoginAttempts(email: string): Promise<LoginAttempt> {
+    const response = await apiClient.get('/auth/login-attempts', { params: { email } });
     return response.data;
   }
 

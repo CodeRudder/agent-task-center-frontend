@@ -16,11 +16,11 @@ interface AuthState {
   loginAttempts: LoginAttempt | null;
 
   // Actions
-  login: (username: string, password: string, rememberMe?: boolean) => Promise<void>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   logout: () => Promise<void>;
   getCurrentUser: () => Promise<void>;
   refreshToken: () => Promise<void>;
-  checkLoginAttempts: (username: string) => Promise<LoginAttempt>;
+  checkLoginAttempts: (email: string) => Promise<LoginAttempt>;
   clearError: () => void;
   loadSessions: () => Promise<void>;
   logoutSession: (sessionId: string) => Promise<void>;
@@ -39,10 +39,10 @@ export const useAuthStore = create<AuthState>()(
       loginAttempts: null,
 
       // 登录
-      login: async (username: string, password: string, rememberMe = false) => {
+      login: async (email: string, password: string, rememberMe = false) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await AuthService.login({ username, password, rememberMe });
+          const response = await AuthService.login({ email, password });
 
           // 保存Token
           localStorage.setItem('accessToken', response.accessToken);
@@ -127,9 +127,9 @@ export const useAuthStore = create<AuthState>()(
       },
 
       // 检查登录尝试次数
-      checkLoginAttempts: async (username: string) => {
+      checkLoginAttempts: async (email: string) => {
         try {
-          const attempts = await AuthService.checkLoginAttempts(username);
+          const attempts = await AuthService.checkLoginAttempts(email);
           set({ loginAttempts: attempts });
           return attempts;
         } catch (error) {
