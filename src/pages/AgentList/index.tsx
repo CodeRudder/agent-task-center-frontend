@@ -9,8 +9,18 @@ import {
   Statistic,
   Row,
   Col,
+  Button,
+  Modal,
+  message,
 } from 'antd';
-import { TeamOutlined, UserOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import {
+  TeamOutlined,
+  UserOutlined,
+  ClockCircleOutlined,
+  KeyOutlined,
+  CopyOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
 import { agentService, Agent } from '../../services/agent.service';
 import { formatDate } from '../../utils/storage';
 
@@ -21,6 +31,10 @@ const AgentList: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
   const [typeFilter, setTypeFilter] = useState<string | undefined>();
+  const [tokenModalVisible, setTokenModalVisible] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [tokenLoading, setTokenLoading] = useState(false);
+  const [tokenValue, setTokenValue] = useState('');
 
   useEffect(() => {
     loadAgents();
@@ -37,9 +51,57 @@ const AgentList: React.FC = () => {
       setAgents(data);
     } catch (error) {
       console.error('加载Agent列表失败:', error);
+      message.error('加载Agent列表失败');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleViewToken = async (agent: Agent) => {
+    setSelectedAgent(agent);
+    setTokenLoading(true);
+    setTokenModalVisible(true);
+    
+    try {
+      const fullAgent = await agentService.getAgent(agent.id);
+      setTokenValue(fullAgent.apiToken || '');
+    } catch (error) {
+      console.error('获取Token失败:', error);
+      message.error('获取Token失败');
+      setTokenModalVisible(false);
+    } finally {
+      setTokenLoading(false);
+    }
+  };
+
+  const handleCopyToken = () => {
+    navigator.clipboard.writeText(tokenValue);
+    message.success('Token已复制到剪贴板');
+  };
+
+  const handleResetToken = async () => {
+    if (!selectedAgent) return;
+    
+    Modal.confirm({
+      title: '确认重置Token',
+      content: '重置Token后，原有Token将失效，需要更新所有使用该Token的配置。',
+      okText: '确认',
+      cancelText: '取消',
+      okType: 'danger',
+      onOk: async () => {
+        setTokenLoading(true);
+        try {
+          const result = await agentService.regenerateToken(selectedAgent.id);
+          setTokenValue(result.token);
+          message.success('Token重置成功');
+        } catch (error) {
+          console.error('重置Token失败:', error);
+          message.error('重置Token失败');
+        } finally {
+          setTokenLoading(false);
+        }
+      },
+    });
   };
 
   const getStatusColor = (status: string) => {
@@ -137,6 +199,19 @@ const AgentList: React.FC = () => {
             </Tag>
           ))}
         </Space>
+      ),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_: any, agent: Agent) => (
+        <Button
+          type="primary"
+          icon={<KeyOutlined />}
+          onClick={() => handleViewToken(agent)}
+        >
+          管理Token
+        </Button>
       ),
     },
   ];
@@ -238,6 +313,66 @@ const AgentList: React.FC = () => {
           }}
         />
       </Card>
+
+      {/* Token管理Modal */}
+      <Modal
+        title={
+          <Space>
+            <KeyOutlined />
+            <span>管理Token - {selectedAgent?.name}</span>
+          </Space>
+        }
+        open={tokenModalVisible}
+        onCancel={() => {
+          setTokenModalVisible(false);
+          setSelectedAgent(null);
+          setTokenValue('');
+        }}
+        footer={[
+          <Button key="copy" icon={<CopyOutlined />} onClick={handleCopyToken} disabled={!tokenValue}>
+            复制Token
+          </Button>,
+          <Button
+            key="reset"
+            icon={<ReloadOutlined />}
+            onClick={handleResetToken}
+            danger
+            loading={tokenLoading}
+          >
+            重置Token
+          </Button>,
+          <Button key="close" onClick={() => {
+            setTokenModalVisible(false);
+            setSelectedAgent(null);
+            setTokenValue('');
+          }}>
+            关闭
+          </Button>,
+        ]}
+      >
+        {tokenLoading ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>加载中...</div>
+        ) : (
+          <div>
+            <p style={{ marginBottom: 8 }}>API Token：</p>
+            <div
+              style={{
+                padding: '12px',
+                backgroundColor: '#f5f5f5',
+                borderRadius: '4px',
+                fontFamily: 'monospace',
+                wordBreak: 'break-all',
+                border: '1px solid #d9d9d9',
+              }}
+            >
+              {tokenValue}
+            </div>
+            <p style={{ marginTop: 16, color: '#8c8c8c', fontSize: 12 }}>
+              Token用于API认证，请妥善保管。重置后原Token将失效。
+            </p>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 };
