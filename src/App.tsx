@@ -9,6 +9,7 @@ import TokenManagementPage from '@/pages/TokenManagementPage';
 import TaskListPage from '@/pages/TaskListPage';
 import TaskDetailPage from '@/pages/TaskDetailPage';
 import ToastContainer from '@/components/Toast';
+import Layout from '@/components/Layout';
 
 // 受保护的路由组件
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -57,7 +58,9 @@ function App() {
           path="/"
           element={
             <ProtectedRoute>
+              <Layout>
               <TokenManagementPage />
+            </Layout>
             </ProtectedRoute>
           }
         />
@@ -66,7 +69,9 @@ function App() {
           path="/tokens"
           element={
             <ProtectedRoute>
+              <Layout>
               <TokenManagementPage />
+            </Layout>
             </ProtectedRoute>
           }
         />
@@ -76,7 +81,9 @@ function App() {
           path="/tasks"
           element={
             <ProtectedRoute>
+              <Layout>
               <TaskListPage />
+            </Layout>
             </ProtectedRoute>
           }
         />
@@ -85,7 +92,9 @@ function App() {
           path="/tasks/:id"
           element={
             <ProtectedRoute>
+              <Layout>
               <TaskDetailPage />
+            </Layout>
             </ProtectedRoute>
           }
         />

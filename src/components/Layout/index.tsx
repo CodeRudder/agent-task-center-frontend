@@ -9,7 +9,7 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuthStore } from '../../stores/auth.store';
+import { useAuthStore } from '@/stores/authStore';
 
 const { Header, Sider, Content } = AntLayout;
 
@@ -109,7 +109,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
           >
             <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
               <Avatar icon={<UserOutlined />} />
-              <span style={{ marginLeft: 8 }}>{user?.name || '用户'}</span>
+              <span style={{ marginLeft: 8 }}>{user?.email?.split('@')[0] || '用户'}</span>
             </div>
           </Dropdown>
         </Header>
