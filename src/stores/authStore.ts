@@ -27,6 +27,15 @@ interface AuthState {
   logoutOtherSessions: () => Promise<void>;
 }
 
+/**
+ * 验证 Token 有效性
+ * @param token - 要验证的 token
+ * @returns 是否有效
+ */
+const isValidToken = (token: unknown): token is string => {
+  return typeof token === 'string' && token.length > 0 && token !== 'undefined';
+};
+
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
@@ -44,10 +53,25 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await AuthService.login({ email, password });
 
-          // 保存Token
-          localStorage.setItem('accessToken', response.accessToken);
-          if (rememberMe) {
-            localStorage.setItem('refreshToken', response.refreshToken);
+          // Bug Fix #1: 兼容后端返回的不同字段名 (accessToken 或 access_token)
+          // 有些后端API使用驼峰命名，有些使用下划线命名
+          const accessToken = response.accessToken || (response as any).access_token;
+          const refreshToken = response.refreshToken || (response as any).refresh_token;
+
+          // 验证 Token 有效性
+          if (!isValidToken(accessToken)) {
+            console.error('[AuthStore] Invalid accessToken received:', { 
+              accessToken, 
+              responseType: typeof accessToken,
+              response 
+            });
+            throw new Error('登录失败：服务器返回的Token无效');
+          }
+
+          // 保存Token到 localStorage
+          localStorage.setItem('accessToken', accessToken);
+          if (rememberMe && isValidToken(refreshToken)) {
+            localStorage.setItem('refreshToken', refreshToken);
           }
 
           set({
@@ -57,7 +81,7 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           });
         } catch (error: any) {
-          const errorMessage = error.response?.data?.message || '登录失败';
+          const errorMessage = error.response?.data?.message || error.message || '登录失败';
           set({
             isLoading: false,
             error: errorMessage,
@@ -74,6 +98,9 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error('Logout error:', error);
         } finally {
+          // 确保清除所有认证相关数据
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
           set({
             user: null,
             isAuthenticated: false,
@@ -113,7 +140,13 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           const response = await AuthService.refreshToken(refreshToken);
-          localStorage.setItem('accessToken', response.accessToken);
+          const newAccessToken = response.accessToken || (response as any).access_token;
+          
+          if (!isValidToken(newAccessToken)) {
+            throw new Error('Token刷新失败：服务器返回的Token无效');
+          }
+          
+          localStorage.setItem('accessToken', newAccessToken);
         } catch (error) {
           // Token刷新失败，需要重新登录
           localStorage.removeItem('accessToken');

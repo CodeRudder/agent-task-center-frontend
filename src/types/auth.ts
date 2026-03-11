@@ -29,6 +29,7 @@ export interface LoginResponse {
 export interface User {
   id: string;
   email: string;
+  name: string;
   role: UserRole;
   createdAt: string;
   lastLoginAt?: string;

@@ -8,13 +8,26 @@ import AgentList from './pages/AgentList';
 import AgentCreate from './pages/AgentCreate';
 import AgentDetail from './pages/AgentDetail';
 import TaskTemplates from './pages/TaskTemplates';
+import { useAuthStore } from './stores/authStore';
 
 // 路由守卫组件
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('accessToken');
+  const { isAuthenticated, getCurrentUser } = useAuthStore();
   
-  if (!token) {
+  // 检查token是否存在且有效（不是"undefined"或"null"字符串）
+  if (!token || token === 'undefined' || token === 'null' || token === '') {
     return <Navigate to="/login" replace />;
+  }
+  
+  // 检查用户是否已认证
+  if (!isAuthenticated) {
+    // 尝试获取用户信息
+    getCurrentUser().catch(() => {
+      // 获取失败，重定向到登录页
+      window.location.href = '/login';
+    });
+    return null; // 或者显示加载状态
   }
   
   return <>{children}</>;
