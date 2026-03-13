@@ -5,10 +5,10 @@
 
 import { useCallback, useEffect } from 'react';
 import { useDependencyStore } from '../stores/dependencyStore';
+import { DependencyType } from '../types/dependency';
 import type { 
   TaskDependency, 
-  CreateDependencyParams,
-  DependencyType 
+  CreateDependencyParams
 } from '../types/dependency';
 
 /**
@@ -83,7 +83,7 @@ export const useTaskDependencies = (taskId?: string) => {
   }, [setSelectedTaskId]);
 
   /**
-   * 获取当前任务的依赖关系
+   * 获取当前任务的依赖关系列表
    */
   const currentTaskDependencies = taskId
     ? dependencies.filter((dep) => dep.taskId === taskId)

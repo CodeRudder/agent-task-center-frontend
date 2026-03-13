@@ -41,8 +41,9 @@ export enum DependencyType {
 /**
  * 依赖图节点数据
  * 用于React Flow节点显示
+ * 注意：添加索引签名以兼容React Flow的Record<string, unknown>约束
  */
-export interface TaskNodeData {
+export interface TaskNodeData extends Record<string, unknown> {
   /** 任务ID */
   taskId: string;
   /** 任务标题 */
