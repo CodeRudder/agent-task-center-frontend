@@ -1,6 +1,7 @@
 /**
  * V5.3 任务依赖关系状态管理
  * 使用Zustand管理任务依赖关系的全局状态
+ * Day 3更新：添加布局方向、节点锁定状态
  */
 
 import { create } from 'zustand';
@@ -9,6 +10,11 @@ import type {
   CreateDependencyParams,
   DependencyType 
 } from '../types/dependency';
+
+/**
+ * 布局方向类型
+ */
+type LayoutDirection = 'horizontal' | 'vertical';
 
 /**
  * 依赖关系状态接口
@@ -26,6 +32,15 @@ interface DependencyState {
   /** 错误信息 */
   error: string | null;
   
+  /** 布局方向 */
+  layoutDirection: LayoutDirection;
+  
+  /** 节点是否锁定 */
+  isLocked: boolean;
+  
+  /** 循环依赖路径 */
+  cyclePath: string[] | null;
+  
   /** 设置依赖关系列表 */
   setDependencies: (dependencies: TaskDependency[]) => void;
   
@@ -37,6 +52,15 @@ interface DependencyState {
   
   /** 设置选中的任务ID */
   setSelectedTaskId: (taskId: string | null) => void;
+  
+  /** 设置布局方向 */
+  setLayoutDirection: (direction: LayoutDirection) => void;
+  
+  /** 设置节点锁定状态 */
+  setIsLocked: (locked: boolean) => void;
+  
+  /** 设置循环依赖路径 */
+  setCyclePath: (path: string[] | null) => void;
   
   /** 获取任务依赖关系 */
   fetchDependencies: (taskId: string) => Promise<void>;
@@ -60,6 +84,9 @@ export const useDependencyStore = create<DependencyState>((set, get) => ({
   selectedTaskId: null,
   loading: false,
   error: null,
+  layoutDirection: 'horizontal',
+  isLocked: false,
+  cyclePath: null,
   
   // 设置依赖关系列表
   setDependencies: (dependencies) => set({ dependencies }),
@@ -80,6 +107,15 @@ export const useDependencyStore = create<DependencyState>((set, get) => ({
   
   // 设置选中的任务ID
   setSelectedTaskId: (taskId) => set({ selectedTaskId: taskId }),
+  
+  // 设置布局方向
+  setLayoutDirection: (direction) => set({ layoutDirection: direction }),
+  
+  // 设置节点锁定状态
+  setIsLocked: (locked) => set({ isLocked: locked }),
+  
+  // 设置循环依赖路径
+  setCyclePath: (path) => set({ cyclePath: path }),
   
   // 获取任务依赖关系（模拟API调用）
   fetchDependencies: async (taskId) => {

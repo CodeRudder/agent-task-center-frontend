@@ -1,6 +1,7 @@
 /**
  * V5.3 依赖关系工具函数
  * 包含节点布局算法、数据转换函数等
+ * Day 3更新：支持布局方向参数
  */
 
 import dagre from 'dagre';
@@ -8,16 +9,21 @@ import type { Node, Edge } from '@xyflow/react';
 import type { TaskNodeData } from '../types/dependency';
 
 /**
+ * 布局方向类型
+ */
+export type LayoutDirection = 'horizontal' | 'vertical';
+
+/**
  * Dagre布局配置
  */
-const DAGRE_CONFIG = {
-  rankdir: 'TB', // 从上到下布局
+const getDagreConfig = (direction: LayoutDirection = 'vertical') => ({
+  rankdir: direction === 'horizontal' ? 'LR' : 'TB', // 水平：从左到右，垂直：从上到下
   align: 'UL', // 对齐方式
   nodesep: 80, // 节点间距
   ranksep: 120, // 层级间距
   marginx: 50, // x轴边距
   marginy: 50, // y轴边距
-};
+});
 
 /**
  * 节点尺寸配置
@@ -31,18 +37,20 @@ const NODE_SIZE = {
  * 使用dagre布局算法计算节点位置
  * @param nodes 节点列表
  * @param edges 边列表
+ * @param direction 布局方向（horizontal或vertical）
  * @returns 布局后的节点列表
  */
 export function getLayoutedElements(
   nodes: Node<TaskNodeData>[],
-  edges: Edge[]
+  edges: Edge[],
+  direction: LayoutDirection = 'vertical'
 ): Node<TaskNodeData>[] {
   // 创建dagre图
   const dagreGraph = new dagre.graphlib.Graph();
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   
-  // 设置图配置
-  dagreGraph.setGraph(DAGRE_CONFIG);
+  // 设置图配置（根据布局方向）
+  dagreGraph.setGraph(getDagreConfig(direction));
   
   // 添加节点
   nodes.forEach((node) => {
@@ -78,8 +86,6 @@ export function getLayoutedElements(
 
 /**
  * 转换任务数据为React Flow节点格式
- * @param tasks 任务列表
- * @returns React Flow节点列表
  */
 export function convertTasksToNodes(
   tasks: Array<{
@@ -110,8 +116,6 @@ export function convertTasksToNodes(
 
 /**
  * 转换依赖关系数据为React Flow边格式
- * @param dependencies 依赖关系列表
- * @returns React Flow边列表
  */
 export function convertDependenciesToEdges(
   dependencies: Array<{
@@ -135,9 +139,6 @@ export function convertDependenciesToEdges(
 
 /**
  * 计算图的统计信息
- * @param nodes 节点列表
- * @param edges 边列表
- * @returns 统计信息
  */
 export function calculateGraphStats(
   nodes: Node<TaskNodeData>[],
@@ -195,9 +196,6 @@ export function calculateGraphStats(
 
 /**
  * 查找节点的所有前置任务
- * @param taskId 任务ID
- * @param edges 边列表
- * @returns 前置任务ID列表
  */
 export function getPredecessors(taskId: string, edges: Edge[]): string[] {
   return edges
@@ -207,9 +205,6 @@ export function getPredecessors(taskId: string, edges: Edge[]): string[] {
 
 /**
  * 查找节点的所有后置任务
- * @param taskId 任务ID
- * @param edges 边列表
- * @returns 后置任务ID列表
  */
 export function getSuccessors(taskId: string, edges: Edge[]): string[] {
   return edges
@@ -219,9 +214,6 @@ export function getSuccessors(taskId: string, edges: Edge[]): string[] {
 
 /**
  * 检测节点是否可以拖拽
- * @param nodeId 节点ID
- * @param isLocked 是否锁定布局
- * @returns 是否可以拖拽
  */
 export function canDragNode(nodeId: string, isLocked: boolean): boolean {
   return !isLocked;
@@ -229,8 +221,6 @@ export function canDragNode(nodeId: string, isLocked: boolean): boolean {
 
 /**
  * 获取节点样式类名
- * @param status 任务状态
- * @returns 样式类名
  */
 export function getNodeStyleClass(status: string): string {
   const statusStyles: Record<string, string> = {
