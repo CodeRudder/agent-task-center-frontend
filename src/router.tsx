@@ -8,6 +8,8 @@ import AgentList from './pages/AgentList';
 import AgentCreate from './pages/AgentCreate';
 import AgentDetail from './pages/AgentDetail';
 import TaskTemplates from './pages/TaskTemplates';
+import TagManagement from './pages/TagManagement/TagManagementPage';
+import ReportStatistics from './pages/ReportStatistics/ReportStatisticsPage';
 import { useAuthStore } from './stores/authStore';
 
 // 路由守卫组件
@@ -77,6 +79,14 @@ export const router = createBrowserRouter([
       {
         path: 'templates',
         element: <TaskTemplates />,
+      },
+      {
+        path: 'tags',
+        element: <TagManagement />,
+      },
+      {
+        path: 'statistics',
+        element: <ReportStatistics />,
       },
     ],
   },

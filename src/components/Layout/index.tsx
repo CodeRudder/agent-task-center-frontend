@@ -3,10 +3,12 @@ import { Layout as AntLayout, Menu, Avatar, Dropdown } from 'antd';
 import {
   DashboardOutlined,
   TagsOutlined,
+  TagOutlined,
   TeamOutlined,
   UserOutlined,
   LogoutOutlined,
   FileTextOutlined,
+  BarChartOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
@@ -33,6 +35,16 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
       key: '/templates',
       icon: <FileTextOutlined />,
       label: '任务模板',
+    },
+    {
+      key: '/tags',
+      icon: <TagOutlined />,
+      label: '标签管理',
+    },
+    {
+      key: '/statistics',
+      icon: <BarChartOutlined />,
+      label: '统计报表',
     },
     {
       key: '/agents',

@@ -8,6 +8,8 @@ import LoginPage from '@/pages/LoginPage';
 import TokenManagementPage from '@/pages/TokenManagementPage';
 import TaskListPage from '@/pages/TaskListPage';
 import TaskDetailPage from '@/pages/TaskDetailPage';
+import TagManagementPage from '@/pages/TagManagement/TagManagementPage';
+import ReportStatisticsPage from '@/pages/ReportStatistics/ReportStatisticsPage';
 import ToastContainer from '@/components/Toast';
 import Layout from '@/components/Layout';
 
@@ -157,6 +159,30 @@ function App() {
             <ProtectedRoute>
               <Layout>
               <TaskDetailPage />
+            </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 标签管理路由 - V5.3 P2-4 */}
+        <Route
+          path="/tags"
+          element={
+            <ProtectedRoute>
+              <Layout>
+              <TagManagementPage />
+            </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 统计报表路由 - V5.3 P2-5 */}
+        <Route
+          path="/statistics"
+          element={
+            <ProtectedRoute>
+              <Layout>
+              <ReportStatisticsPage />
             </Layout>
             </ProtectedRoute>
           }
