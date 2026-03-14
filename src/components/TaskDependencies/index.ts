@@ -13,3 +13,8 @@ export { default as DependencyMinimap } from './DependencyMinimap';
 export type { CycleDetectionProps, CyclePath } from './CycleDetection';
 export type { DependencyControlsProps, LayoutDirection } from './DependencyControls';
 export type { DependencyMinimapProps } from './DependencyMinimap';
+
+
+// 导出DependencyList组件
+export { default as DependencyList } from './DependencyList';
+export type { DependencyListProps, DependencyItemProps } from './DependencyList';
