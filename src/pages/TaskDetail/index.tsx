@@ -20,6 +20,7 @@ import {
   CheckOutlined,
   CloseOutlined,
   ArrowLeftOutlined,
+  GitBranchOutlined,
 } from '@ant-design/icons';
 import { taskService, Task } from '../../services/task.service';
 import { useTaskStore } from '../../stores/task.store';
@@ -149,6 +150,12 @@ const TaskDetail: React.FC = () => {
               onClick={() => navigate(`/tasks/${task.id}/edit`)}
             >
               编辑
+            </Button>
+            <Button
+              icon={<GitBranchOutlined />}
+              onClick={() => navigate(`/tasks/${task.id}/dependencies`)}
+            >
+              依赖关系
             </Button>
             <Button
               danger

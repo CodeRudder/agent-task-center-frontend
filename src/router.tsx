@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import TaskList from './pages/TaskList';
 import TaskDetail from './pages/TaskDetail';
+import TaskDependencies from './pages/TaskDependencies';
 import AgentList from './pages/AgentList';
 import AgentCreate from './pages/AgentCreate';
 import AgentDetail from './pages/AgentDetail';
@@ -63,6 +64,10 @@ export const router = createBrowserRouter([
       {
         path: 'tasks/:id',
         element: <TaskDetail />,
+      },
+      {
+        path: 'tasks/:id/dependencies',
+        element: <TaskDependencies />,
       },
       {
         path: 'agents',
