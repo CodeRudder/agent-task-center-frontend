@@ -19,7 +19,7 @@ export class StatisticsService {
    * 获取任务统计数据
    */
   static async getTaskStatistics(filters?: StatisticsFilters): Promise<TaskStatistics> {
-    const response = await apiClient.get('/api/v1/statistics/tasks', { params: filters });
+    const response = await apiClient.get('/v1/statistics/tasks', { params: filters });
     return response.data;
   }
 
@@ -27,7 +27,7 @@ export class StatisticsService {
    * 获取工作量统计数据
    */
   static async getWorkloadStatistics(filters?: StatisticsFilters): Promise<WorkloadStatistics[]> {
-    const response = await apiClient.get('/api/v1/statistics/workload', { params: filters });
+    const response = await apiClient.get('/v1/statistics/workload', { params: filters });
     return response.data;
   }
 
@@ -38,7 +38,7 @@ export class StatisticsService {
     period: 'day' | 'week' | 'month',
     filters?: StatisticsFilters
   ): Promise<TrendStatistics> {
-    const response = await apiClient.get('/api/v1/statistics/trends', {
+    const response = await apiClient.get('/v1/statistics/trends', {
       params: { ...filters, period },
     });
     return response.data;
@@ -49,7 +49,7 @@ export class StatisticsService {
    */
   static async exportToCSV(type: 'tasks' | 'workload' | 'trends', filters?: StatisticsFilters): Promise<void> {
     try {
-      const response = await apiClient.get('/api/v1/statistics/export/csv', {
+      const response = await apiClient.get('/v1/statistics/export/csv', {
         params: { type, ...filters },
         responseType: 'blob',
       });
@@ -78,7 +78,7 @@ export class StatisticsService {
    */
   static async exportToExcel(type: 'tasks' | 'workload' | 'trends', filters?: StatisticsFilters): Promise<void> {
     try {
-      const response = await apiClient.get('/api/v1/statistics/export/excel', {
+      const response = await apiClient.get('/v1/statistics/export/excel', {
         params: { type, ...filters },
         responseType: 'blob',
       });

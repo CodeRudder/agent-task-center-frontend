@@ -226,7 +226,9 @@ export class TaskService {
     parentId: string,
     data: CreateSubTaskRequest
   ): Promise<SubTask> {
-    const response = await apiClient.post(`/api/v1/tasks/${parentId}/subtasks`, data);
+    // Bug Fix #3: 修复 API 路径重复 /api 的问题
+    // apiClient.baseURL = '/api'，所以路径应该是 '/v1/tasks/...' 而不是 '/v1/tasks/...'
+    const response = await apiClient.post(`/v1/tasks/${parentId}/subtasks`, data);
     return response.data;
   }
 
@@ -237,7 +239,8 @@ export class TaskService {
     parentId: string,
     params?: { page?: number; pageSize?: number }
   ): Promise<SubTaskListResponse> {
-    const response = await apiClient.get(`/api/v1/tasks/${parentId}/subtasks`, { params });
+    // Bug Fix #3: 修复 API 路径重复 /api 的问题
+    const response = await apiClient.get(`/v1/tasks/${parentId}/subtasks`, { params });
     return response.data;
   }
 
@@ -246,7 +249,7 @@ export class TaskService {
    */
   static async getTaskTree(parentId?: string): Promise<TaskTreeNode[]> {
     const params = parentId ? { parentId } : {};
-    const response = await apiClient.get('/api/v1/tasks/tree', { params });
+    const response = await apiClient.get('/v1/tasks/tree', { params });
     return response.data;
   }
 
@@ -257,7 +260,7 @@ export class TaskService {
     taskId: string,
     data: SetDependenciesRequest
   ): Promise<TaskDependency[]> {
-    const response = await apiClient.put(`/api/v1/tasks/${taskId}/dependencies`, data);
+    const response = await apiClient.put(`/v1/tasks/${taskId}/dependencies`, data);
     return response.data;
   }
 
@@ -265,7 +268,7 @@ export class TaskService {
    * 获取任务依赖关系 - V5.2 P0
    */
   static async getDependencies(taskId: string): Promise<TaskDependency[]> {
-    const response = await apiClient.get(`/api/v1/tasks/${taskId}/dependencies`);
+    const response = await apiClient.get(`/v1/tasks/${taskId}/dependencies`);
     return response.data;
   }
 
@@ -273,7 +276,8 @@ export class TaskService {
    * 删除任务依赖关系 - V5.2 P0
    */
   static async removeDependency(taskId: string, depId: string): Promise<void> {
-    await apiClient.delete(`/api/v1/tasks/${taskId}/dependencies/${depId}`);
+    // Bug Fix #3: 修复 API 路径重复 /api 的问题
+    await apiClient.delete(`/v1/tasks/${taskId}/dependencies/${depId}`);
   }
 
   /**
@@ -284,7 +288,7 @@ export class TaskService {
     cyclePath?: string[];
     blockedBy?: string[];
   }> {
-    const response = await apiClient.post(`/api/v1/tasks/${taskId}/check-dependencies`);
+    const response = await apiClient.post(`/v1/tasks/${taskId}/check-dependencies`);
     return response.data;
   }
 
@@ -300,7 +304,7 @@ export class TaskService {
     taskId: string,
     voteType: VoteType
   ): Promise<VoteResult> {
-    const response = await apiClient.post(`/api/v1/tasks/${taskId}/vote`, {
+    const response = await apiClient.post(`/v1/tasks/${taskId}/vote`, {
       voteType,
     });
     return response.data;
@@ -312,7 +316,7 @@ export class TaskService {
    * @returns 投票统计信息
    */
   static async getTaskVotes(taskId: string): Promise<VoteStats> {
-    const response = await apiClient.get(`/api/v1/tasks/${taskId}/votes`);
+    const response = await apiClient.get(`/v1/tasks/${taskId}/votes`);
     return response.data;
   }
 
@@ -322,7 +326,7 @@ export class TaskService {
    * @returns 匹配的任务列表
    */
   static async searchTaskById(searchId: string): Promise<Task[]> {
-    const response = await apiClient.get('/api/v1/tasks/search', {
+    const response = await apiClient.get('/v1/tasks/search', {
       params: { id: searchId },
     });
     return response.data;
@@ -334,7 +338,8 @@ export class TaskService {
    * @returns 任务列表
    */
   static async batchQueryTasks(taskIds: string[]): Promise<Task[]> {
-    const response = await apiClient.post('/api/v1/tasks/batch-query', {
+    // Bug Fix #3: 修复 API 路径重复 /api 的问题
+    const response = await apiClient.post('/v1/tasks/batch-query', {
       ids: taskIds,
     });
     return response.data;

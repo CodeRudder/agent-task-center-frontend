@@ -32,7 +32,7 @@ export class TagService {
       page,
       pageSize,
     };
-    const response = await apiClient.get('/api/v1/tags', { params });
+    const response = await apiClient.get('/v1/tags', { params });
     return response.data;
   }
 
@@ -40,7 +40,7 @@ export class TagService {
    * 获取标签详情
    */
   static async getTag(id: string): Promise<Tag> {
-    const response = await apiClient.get(`/api/v1/tags/${id}`);
+    const response = await apiClient.get(`/v1/tags/${id}`);
     return response.data;
   }
 
@@ -48,7 +48,7 @@ export class TagService {
    * 创建标签
    */
   static async createTag(data: CreateTagRequest): Promise<Tag> {
-    const response = await apiClient.post('/api/v1/tags', data);
+    const response = await apiClient.post('/v1/tags', data);
     return response.data;
   }
 
@@ -56,7 +56,7 @@ export class TagService {
    * 更新标签
    */
   static async updateTag(id: string, data: UpdateTagRequest): Promise<Tag> {
-    const response = await apiClient.patch(`/api/v1/tags/${id}`, data);
+    const response = await apiClient.patch(`/v1/tags/${id}`, data);
     return response.data;
   }
 
@@ -64,14 +64,14 @@ export class TagService {
    * 删除标签
    */
   static async deleteTag(id: string): Promise<void> {
-    await apiClient.delete(`/api/v1/tags/${id}`);
+    await apiClient.delete(`/v1/tags/${id}`);
   }
 
   /**
    * 批量删除标签
    */
   static async batchDeleteTags(ids: string[]): Promise<{ success: number; failed: number }> {
-    const response = await apiClient.post('/api/v1/tags/batch-delete', { ids });
+    const response = await apiClient.post('/v1/tags/batch-delete', { ids });
     return response.data;
   }
 
@@ -81,7 +81,7 @@ export class TagService {
    * 获取分类列表
    */
   static async getCategories(): Promise<Category[]> {
-    const response = await apiClient.get('/api/v1/categories');
+    const response = await apiClient.get('/v1/categories');
     return response.data;
   }
 
@@ -89,7 +89,7 @@ export class TagService {
    * 获取分类详情
    */
   static async getCategory(id: string): Promise<Category> {
-    const response = await apiClient.get(`/api/v1/categories/${id}`);
+    const response = await apiClient.get(`/v1/categories/${id}`);
     return response.data;
   }
 
@@ -97,7 +97,7 @@ export class TagService {
    * 创建分类
    */
   static async createCategory(data: CreateCategoryRequest): Promise<Category> {
-    const response = await apiClient.post('/api/v1/categories', data);
+    const response = await apiClient.post('/v1/categories', data);
     return response.data;
   }
 
@@ -105,7 +105,7 @@ export class TagService {
    * 更新分类
    */
   static async updateCategory(id: string, data: UpdateCategoryRequest): Promise<Category> {
-    const response = await apiClient.patch(`/api/v1/categories/${id}`, data);
+    const response = await apiClient.patch(`/v1/categories/${id}`, data);
     return response.data;
   }
 
@@ -113,7 +113,7 @@ export class TagService {
    * 删除分类
    */
   static async deleteCategory(id: string): Promise<void> {
-    await apiClient.delete(`/api/v1/categories/${id}`);
+    await apiClient.delete(`/v1/categories/${id}`);
   }
 }
 

@@ -34,7 +34,7 @@ export class AgentService {
   static async getAgentsWithLoad(
     params?: PaginationParams & FilterParams
   ): Promise<PaginatedResponse<ExtendedAgent>> {
-    const response = await apiClient.get('/api/v1/agents', { params });
+    const response = await apiClient.get('/v1/agents', { params });
     return response.data;
   }
 
@@ -50,7 +50,7 @@ export class AgentService {
    * 获取Agent详情（含能力标签）- V5.2 P0
    */
   static async getAgentDetails(id: string): Promise<ExtendedAgent> {
-    const response = await apiClient.get(`/api/v1/agents/${id}`);
+    const response = await apiClient.get(`/v1/agents/${id}`);
     return response.data;
   }
 
@@ -141,7 +141,7 @@ export class AgentService {
    * 获取Agent负载详情 - V5.2 P0
    */
   static async getAgentLoad(agentId: string): Promise<AgentLoad> {
-    const response = await apiClient.get(`/api/v1/agents/${agentId}/load`);
+    const response = await apiClient.get(`/v1/agents/${agentId}/load`);
     return response.data;
   }
 
@@ -149,7 +149,7 @@ export class AgentService {
    * 获取负载汇总 - V5.2 P0
    */
   static async getLoadSummary(): Promise<AgentLoadSummary> {
-    const response = await apiClient.get('/api/v1/agents/load-summary');
+    const response = await apiClient.get('/v1/agents/load-summary');
     return response.data;
   }
 
@@ -160,7 +160,7 @@ export class AgentService {
     agentId: string,
     period: string = 'last_30_days'
   ): Promise<AgentPerformance> {
-    const response = await apiClient.get(`/api/v1/agents/${agentId}/performance`, {
+    const response = await apiClient.get(`/v1/agents/${agentId}/performance`, {
       params: { period },
     });
     return response.data;
@@ -174,7 +174,7 @@ export class AgentService {
     sortBy?: 'completionRate' | 'onTimeRate' | 'avgCompletionTimeHours';
     sortOrder?: 'asc' | 'desc';
   }): Promise<{ agents: Array<{ agent: ExtendedAgent; performance: AgentPerformance }> }> {
-    const response = await apiClient.get('/api/v1/agents/performance-ranking', { params });
+    const response = await apiClient.get('/v1/agents/performance-ranking', { params });
     return response.data;
   }
 
@@ -186,7 +186,7 @@ export class AgentService {
     capability: string,
     proficiency: number = 3
   ): Promise<AgentCapability> {
-    const response = await apiClient.post(`/api/v1/agents/${agentId}/capabilities`, {
+    const response = await apiClient.post(`/v1/agents/${agentId}/capabilities`, {
       capability,
       proficiency,
     });
@@ -197,14 +197,14 @@ export class AgentService {
    * 删除Agent能力标签 - V5.2 P0
    */
   static async removeCapability(agentId: string, capId: string): Promise<void> {
-    await apiClient.delete(`/api/v1/agents/${agentId}/capabilities/${capId}`);
+    await apiClient.delete(`/v1/agents/${agentId}/capabilities/${capId}`);
   }
 
   /**
    * 获取Agent能力标签列表 - V5.2 P0
    */
   static async getCapabilities(agentId: string): Promise<AgentCapability[]> {
-    const response = await apiClient.get(`/api/v1/agents/${agentId}/capabilities`);
+    const response = await apiClient.get(`/v1/agents/${agentId}/capabilities`);
     return response.data;
   }
 
@@ -212,7 +212,7 @@ export class AgentService {
   /**
    * 验证Agent Token - V5.0 P0-1 (基于Dev1 f3b18f6修复)
    * 使用 X-Agent-Token header（不是 Authorization: Bearer）
-   * 正确路径：/api/v1/agent/auth/verify
+   * 正确路径：/v1/agent/auth/verify
    */
   static async verifyAgentToken(): Promise<{
     success: boolean;
@@ -236,7 +236,7 @@ export class AgentService {
    * @deprecated 使用 verifyAgentToken 代替
    * V5.0 P0-1 (基于Dev1 f3b18f6修复)
    * 使用 X-Agent-Token header（不是 Authorization: Bearer）
-   * 正确路径：/api/v1/agent/auth/verify
+   * 正确路径：/v1/agent/auth/verify
    */
   static async verifyAgent(token?: string): Promise<{
     success: boolean;
