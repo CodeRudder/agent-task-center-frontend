@@ -4,6 +4,8 @@
 import React, { useEffect, useState } from 'react';
 import { useTaskStore } from '@/stores/taskStore';
 import { useAgentStore } from '@/stores/agentStore';
+import { VoteStats } from '@/components/TaskVote/VoteStats';
+import { TaskIdDisplay } from '@/components/TaskId/TaskIdDisplay';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Select } from '@/components/Select';
@@ -452,6 +454,13 @@ const TaskListPage: React.FC = () => {
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
+                        <TaskIdDisplay
+                          taskId={task.id}
+                          showCopyButton={false}
+                          showDropdown={false}
+                          showFullId={true}
+                          className="text-xs"
+                        />
                         <h3 className="text-sm font-medium text-gray-900">{task.title}</h3>
                         <span
                           className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusColor(
@@ -470,8 +479,15 @@ const TaskListPage: React.FC = () => {
                       </div>
                       <p className="text-xs text-gray-600 mb-2">{task.description.slice(0, 50)}...</p>
                       <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span>负责人: {task.assigneeName || '-'}</span>
-                        <span>截止: {formatDate(task.dueDate || '')}</span>
+                        <div className="flex items-center gap-4">
+                          <span>负责人: {task.assigneeName || '-'}</span>
+                          <span>截止: {formatDate(task.dueDate || '')}</span>
+                        </div>
+                        <VoteStats
+                          taskId={task.id}
+                          showTotal={false}
+                          className="text-xs"
+                        />
                       </div>
                     </div>
                   </div>
@@ -574,3 +590,4 @@ const TaskListPage: React.FC = () => {
 };
 
 export default TaskListPage;
+

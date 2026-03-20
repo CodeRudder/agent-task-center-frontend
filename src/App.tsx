@@ -98,6 +98,61 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return <>{children}</>;
 };
 
+// 错误边界组件
+interface ErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+  errorInfo: React.ErrorInfo | null;
+}
+
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return { hasError: true, error, errorInfo: null };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('🚨 Error caught by boundary:');
+    console.error('Error:', error.toString());
+    console.error('Component Stack:', errorInfo.componentStack);
+    this.setState({ errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center p-8 bg-white rounded-lg shadow-lg max-w-2xl">
+            <h1 className="text-2xl font-bold text-red-600 mb-4">🚨 出错了！</h1>
+            <p className="text-gray-700 mb-4">组件渲染时发生错误</p>
+            <div className="text-left bg-gray-100 p-4 rounded mb-4 overflow-auto max-h-96">
+              <p className="font-mono text-sm text-red-600 mb-2">
+                {this.state.error?.toString()}
+              </p>
+              {this.state.errorInfo?.componentStack && (
+                <pre className="font-mono text-xs text-gray-600 whitespace-pre-wrap">
+                  {this.state.errorInfo.componentStack}
+                </pre>
+              )}
+            </div>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              刷新页面
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 function App() {
 
   return (
@@ -122,22 +177,26 @@ function App() {
         <Route
           path="/"
           element={
-            <ProtectedRoute>
-              <Layout>
-              <TokenManagementPage />
-            </Layout>
-            </ProtectedRoute>
+            <ErrorBoundary>
+              <ProtectedRoute>
+                <Layout>
+                <TokenManagementPage />
+              </Layout>
+              </ProtectedRoute>
+            </ErrorBoundary>
           }
         />
 
         <Route
           path="/tokens"
           element={
-            <ProtectedRoute>
-              <Layout>
-              <TokenManagementPage />
-            </Layout>
-            </ProtectedRoute>
+            <ErrorBoundary>
+              <ProtectedRoute>
+                <Layout>
+                <TokenManagementPage />
+              </Layout>
+              </ProtectedRoute>
+            </ErrorBoundary>
           }
         />
 
@@ -145,22 +204,26 @@ function App() {
         <Route
           path="/tasks"
           element={
-            <ProtectedRoute>
-              <Layout>
-              <TaskListPage />
-            </Layout>
-            </ProtectedRoute>
+            <ErrorBoundary>
+              <ProtectedRoute>
+                <Layout>
+                <TaskListPage />
+              </Layout>
+              </ProtectedRoute>
+            </ErrorBoundary>
           }
         />
 
         <Route
           path="/tasks/:id"
           element={
-            <ProtectedRoute>
-              <Layout>
-              <TaskDetailPage />
-            </Layout>
-            </ProtectedRoute>
+            <ErrorBoundary>
+              <ProtectedRoute>
+                <Layout>
+                <TaskDetailPage />
+              </Layout>
+              </ProtectedRoute>
+            </ErrorBoundary>
           }
         />
 
@@ -168,11 +231,13 @@ function App() {
         <Route
           path="/tags"
           element={
-            <ProtectedRoute>
-              <Layout>
-              <TagManagementPage />
-            </Layout>
-            </ProtectedRoute>
+            <ErrorBoundary>
+              <ProtectedRoute>
+                <Layout>
+                <TagManagementPage />
+              </Layout>
+              </ProtectedRoute>
+            </ErrorBoundary>
           }
         />
 
@@ -180,11 +245,13 @@ function App() {
         <Route
           path="/statistics"
           element={
-            <ProtectedRoute>
-              <Layout>
-              <ReportStatisticsPage />
-            </Layout>
-            </ProtectedRoute>
+            <ErrorBoundary>
+              <ProtectedRoute>
+                <Layout>
+                <ReportStatisticsPage />
+              </Layout>
+              </ProtectedRoute>
+            </ErrorBoundary>
           }
         />
 

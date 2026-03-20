@@ -20,6 +20,7 @@ import {
   SetDependenciesRequest,
 } from '@/types/task';
 import { PaginatedResponse } from '@/types/api';
+import { VoteType, VoteResult, VoteStats } from '@/types/vote';
 
 export class TaskService {
   /**
@@ -284,6 +285,58 @@ export class TaskService {
     blockedBy?: string[];
   }> {
     const response = await apiClient.post(`/api/v1/tasks/${taskId}/check-dependencies`);
+    return response.data;
+  }
+
+  // ============ V5.5 新增API ============
+
+  /**
+   * 投票 - V5.5
+   * @param taskId 任务ID
+   * @param voteType 投票类型：support | oppose | abstain
+   * @returns 投票结果
+   */
+  static async voteTask(
+    taskId: string,
+    voteType: VoteType
+  ): Promise<VoteResult> {
+    const response = await apiClient.post(`/api/v1/tasks/${taskId}/vote`, {
+      voteType,
+    });
+    return response.data;
+  }
+
+  /**
+   * 获取任务投票统计 - V5.5
+   * @param taskId 任务ID
+   * @returns 投票统计信息
+   */
+  static async getTaskVotes(taskId: string): Promise<VoteStats> {
+    const response = await apiClient.get(`/api/v1/tasks/${taskId}/votes`);
+    return response.data;
+  }
+
+  /**
+   * 根据ID搜索任务 - V5.5
+   * @param searchId 搜索ID（支持部分匹配）
+   * @returns 匹配的任务列表
+   */
+  static async searchTaskById(searchId: string): Promise<Task[]> {
+    const response = await apiClient.get('/api/v1/tasks/search', {
+      params: { id: searchId },
+    });
+    return response.data;
+  }
+
+  /**
+   * 批量查询任务 - V5.5
+   * @param taskIds 任务ID列表
+   * @returns 任务列表
+   */
+  static async batchQueryTasks(taskIds: string[]): Promise<Task[]> {
+    const response = await apiClient.post('/api/v1/tasks/batch-query', {
+      ids: taskIds,
+    });
     return response.data;
   }
 }
