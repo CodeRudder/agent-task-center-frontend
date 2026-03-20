@@ -33,6 +33,13 @@ export interface Agent {
   lastActiveAt: string;
   createdAt: string;
   tags: string[];
+  tokenCreatedAt?: string;
+  tokenExpiresAt?: string;
+  apiToken?: string;
+  currentTaskCount?: number;
+  maxConcurrentTasks?: number;
+  lastHeartbeatAt?: string;
+  capabilities?: string[];
 }
 
 export interface TokenInfo {

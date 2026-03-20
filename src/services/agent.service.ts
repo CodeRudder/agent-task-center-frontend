@@ -1,17 +1,5 @@
 import api from './api';
-
-export interface Agent {
-  id: number;
-  name: string;
-  type: 'developer' | 'tester' | 'designer' | 'manager';
-  status: 'online' | 'offline' | 'busy';
-  capabilities: string[];
-  maxConcurrentTasks: number;
-  currentTaskCount: number;
-  lastHeartbeatAt: string;
-  createdAt: string;
-  apiToken?: string;
-}
+import { Agent } from '@/types';
 
 export const agentService = {
   // 获取Agent列表
@@ -24,7 +12,7 @@ export const agentService = {
   },
 
   // 获取Agent详情
-  getAgent: async (id: number): Promise<Agent> => {
+  getAgent: async (id: number | string): Promise<Agent> => {
     const response = await api.get(`/agents/${id}`);
     return response.data.data;
   },
@@ -41,19 +29,24 @@ export const agentService = {
   },
 
   // 更新Agent
-  updateAgent: async (id: number, data: Partial<Agent>): Promise<Agent> => {
+  updateAgent: async (id: number | string, data: Partial<Agent>): Promise<Agent> => {
     const response = await api.patch(`/agents/${id}`, data);
     return response.data.data;
   },
 
   // 删除Agent
-  deleteAgent: async (id: number): Promise<void> => {
+  deleteAgent: async (id: number | string): Promise<void> => {
     await api.delete(`/agents/${id}`);
   },
 
   // 重新生成Agent Token
-  regenerateToken: async (id: number): Promise<{ apiToken: string; expiresAt: string }> => {
+  regenerateToken: async (id: number | string): Promise<{ apiToken: string; expiresAt: string }> => {
     const response = await api.post(`/agents/${id}/api-token/regenerate`);
     return response.data.data;
+  },
+
+  // 撤销Agent Token
+  revokeToken: async (id: number | string): Promise<void> => {
+    await api.delete(`/agents/${id}/api-token`);
   },
 };

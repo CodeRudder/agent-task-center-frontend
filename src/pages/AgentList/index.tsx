@@ -21,7 +21,8 @@ import {
   CopyOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { agentService, Agent } from '../../services/agent.service';
+import { agentService } from '../../services/agent.service';
+import { Agent } from '@/types';
 import { formatDate } from '../../utils/storage';
 
 const { Option } = Select;
@@ -92,7 +93,7 @@ const AgentList: React.FC = () => {
         setTokenLoading(true);
         try {
           const result = await agentService.regenerateToken(selectedAgent.id);
-          setTokenValue(result.token);
+          setTokenValue(result.apiToken);
           message.success('Token重置成功');
         } catch (error) {
           console.error('重置Token失败:', error);

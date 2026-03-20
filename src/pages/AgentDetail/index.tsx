@@ -23,7 +23,8 @@ import {
   EditOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import { agentService, Agent } from '../../services/agent.service';
+import { agentService } from '../../services/agent.service';
+import { Agent } from '@/types';
 import { formatDate } from '../../utils/storage';
 
 const { Text, Paragraph } = Typography;
@@ -88,8 +89,8 @@ const AgentDetail: React.FC = () => {
     try {
       setRegenerating(true);
       const result = await agentService.regenerateToken(agentId);
-      if (result.success && result.data.apiToken) {
-        setNewToken(result.data.apiToken);
+      if (result.apiToken) {
+        setNewToken(result.apiToken);
         setTokenModalVisible(true);
         message.success('Token重新生成成功');
         // 刷新Agent数据
@@ -109,14 +110,10 @@ const AgentDetail: React.FC = () => {
     if (!agentId) return;
     
     try {
-      const result = await agentService.revokeToken(agentId);
-      if (result.success) {
-        message.success('Token已撤销');
-        // 刷新Agent数据
-        await loadAgent();
-      } else {
-        message.error('Token撤销失败');
-      }
+      await agentService.revokeToken(agentId);
+      message.success('Token已撤销');
+      // 刷新Agent数据
+      await loadAgent();
     } catch (error) {
       message.error('Token撤销失败');
       console.error('撤销Token失败:', error);

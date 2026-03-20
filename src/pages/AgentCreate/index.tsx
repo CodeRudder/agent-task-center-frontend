@@ -39,13 +39,13 @@ const AgentCreate: React.FC = () => {
       const result = await agentService.createAgent({
         name: values.name,
         type: values.type,
-        description: values.description,
+        // Note: description is not supported in createAgent API
         capabilities: values.capabilities || [],
         maxConcurrentTasks: values.maxConcurrentTasks,
       });
 
-      if (result.success && result.data.apiToken) {
-        setToken(result.data.apiToken);
+      if (result.apiToken) {
+        setToken(result.apiToken);
         setTokenModalVisible(true);
         message.success('Agent创建成功');
         form.resetFields();

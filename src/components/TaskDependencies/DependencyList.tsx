@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, Trash2, Link, LinkOff } from 'lucide-react';
+import { Search, Filter, Trash2, Link, Link2Off } from 'lucide-react';
 import { useDependencyStore } from '../../stores/dependencyStore';
 
 /**
@@ -88,7 +88,7 @@ const DependencyItem: React.FC<DependencyItemProps> = ({
             onClick={() => onEdit?.(dependency.id)}
             title="编辑"
           >
-            <LinkOff className="h-4 w-4 text-gray-600" />
+            <Link2Off className="h-4 w-4 text-gray-600" />
           </button>
           <button
             className="p-1.5 rounded hover:bg-red-100"
