@@ -10,6 +10,7 @@ import TaskListPage from '@/pages/TaskListPage';
 import TaskDetailPage from '@/pages/TaskDetailPage';
 import TagManagementPage from '@/pages/TagManagement/TagManagementPage';
 import ReportStatisticsPage from '@/pages/ReportStatistics/ReportStatisticsPage';
+import UserProfilePage from '@/pages/UserProfilePage';
 import ToastContainer from '@/components/Toast';
 import Layout from '@/components/Layout';
 
@@ -249,6 +250,20 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                 <ReportStatisticsPage />
+              </Layout>
+              </ProtectedRoute>
+            </ErrorBoundary>
+          }
+        />
+
+        {/* 用户信息路由 - V5.3 P0 修复 */}
+        <Route
+          path="/user/profile"
+          element={
+            <ErrorBoundary>
+              <ProtectedRoute>
+                <Layout>
+                <UserProfilePage />
               </Layout>
               </ProtectedRoute>
             </ErrorBoundary>

@@ -76,6 +76,9 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     if (key === 'logout') {
       logout();
       navigate('/login');
+    } else if (key === 'profile') {
+      // P0 修复：点击"个人信息"时跳转到用户信息页面
+      navigate('/user/profile');
     }
   };
 

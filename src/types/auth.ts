@@ -5,6 +5,16 @@
 export enum UserRole {
   ADMIN = 'admin',
   MANAGER = 'manager',
+  PROJECT_MANAGER = 'project_manager',
+  USER = 'user',
+}
+
+// 用户状态
+export enum UserStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PENDING = 'pending',
+  SUSPENDED = 'suspended',
 }
 
 export enum PasswordStrength {
@@ -31,7 +41,12 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  status?: UserStatus; // 用户状态
+  avatar?: string; // 用户头像
+  department?: string; // 部门
+  phone?: string; // 电话
   createdAt: string;
+  updatedAt?: string; // 更新时间
   lastLoginAt?: string;
 }
 
