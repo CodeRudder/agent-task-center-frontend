@@ -1,99 +1,95 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { TaskList } from './pages/TaskList';
+import { TaskDetail } from './pages/TaskDetail';
+import { LoginPage } from './pages/LoginPage';
+import { UserProfilePage } from './pages/UserProfilePage';
+import { UserManagementPage } from './components/User-management';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import './index.css';
+
 /**
  * 主应用组件
+ * 
+ * 配置路由和全局布局
  */
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/authStore';
-import LoginPage from '@/pages/LoginPage';
-import TokenManagementPage from '@/pages/TokenManagementPage';
-import TaskListPage from '@/pages/TaskListPage';
-import TaskDetailPage from '@/pages/TaskDetailPage';
-import ToastContainer from '@/components/Toast';
-
-// 受保护的路由组件
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-};
-
-// 公共路由组件
-const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useAuthStore();
-
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <>{children}</>;
-};
-
 function App() {
+  // 模拟总用户数（用于投票参与率计算）
+  const TOTAL_USERS = 25;
 
   return (
-    <BrowserRouter>
-      <ToastContainer
-        toasts={[]}
-        onRemove={() => {}}
-      />
-
+    <Router>
       <Routes>
-        {/* 公共路由 */}
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <LoginPage />
-            </PublicRoute>
-          }
-        />
-
-        {/* 受保护的路由 */}
-        <Route
-          path="/"
+        {/* 登录页面 */}
+        <Route path="/login" element={<LoginPage />} />
+        
+        {/* 首页重定向到任务列表 */}
+        <Route path="/" element={<Navigate to="/tasks" replace />} />
+        
+        {/* 任务列表页（需要认证） */}
+        <Route 
+          path="/tasks" 
           element={
             <ProtectedRoute>
-              <TokenManagementPage />
+              <TaskList 
+                showSearch={true}
+                showFilters={true}
+                showCreateButton={true}
+              />
             </ProtectedRoute>
-          }
+          } 
         />
-
-        <Route
-          path="/tokens"
+        
+        {/* 任务详情页（需要认证） */}
+        <Route 
+          path="/tasks/:taskId" 
           element={
             <ProtectedRoute>
-              <TokenManagementPage />
+              <TaskDetail totalUsers={TOTAL_USERS} />
             </ProtectedRoute>
-          }
+          } 
         />
-
-        {/* 任务管理路由 */}
-        <Route
-          path="/tasks"
+        
+        {/* 用户管理页（需要认证，管理员权限） */}
+        <Route 
+          path="/users" 
           element={
             <ProtectedRoute>
-              <TaskListPage />
+              <UserManagementPage />
             </ProtectedRoute>
-          }
+          } 
         />
-
-        <Route
-          path="/tasks/:id"
+        
+        {/* 用户个人信息页（需要认证） */}
+        <Route 
+          path="/user/profile" 
           element={
             <ProtectedRoute>
-              <TaskDetailPage />
+              <UserProfilePage />
             </ProtectedRoute>
-          }
+          } 
         />
-
-        {/* 默认重定向 */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        
+        {/* 404页面 */}
+        <Route 
+          path="*" 
+          element={
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
+                <p className="text-gray-600 mb-4">页面不存在</p>
+                <a 
+                  href="/tasks" 
+                  className="text-blue-600 hover:underline"
+                >
+                  返回任务列表
+                </a>
+              </div>
+            </div>
+          } 
+        />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
