@@ -8,6 +8,7 @@ import LoginPage from '@/pages/LoginPage';
 import TokenManagementPage from '@/pages/TokenManagementPage';
 import TaskListPage from '@/pages/TaskListPage';
 import TaskDetailPage from '@/pages/TaskDetailPage';
+import UserManagementPage from '@/pages/UserManagementPage';
 import ToastContainer from '@/components/Toast';
 import Layout from '@/components/Layout';
 
@@ -94,6 +95,18 @@ function App() {
             <ProtectedRoute>
               <Layout>
               <TaskDetailPage />
+            </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 用户管理路由 - V5.6 P0用户管理RBAC权限系统 */}
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <Layout>
+              <UserManagementPage />
             </Layout>
             </ProtectedRoute>
           }

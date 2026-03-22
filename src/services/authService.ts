@@ -19,7 +19,9 @@ export class AuthService {
    */
   static async login(credentials: LoginCredentials): Promise<LoginResponse> {
     const response = await apiClient.post('/auth/login', credentials);
-    return response.data;
+    // 后端响应被TransformInterceptor包装：{ success, statusCode, message, data, timestamp }
+    // response.data是后端响应体，response.data.data才是真正的数据
+    return response.data.data || response.data;
   }
 
   /**
@@ -39,7 +41,7 @@ export class AuthService {
    */
   static async refreshToken(refreshToken: string): Promise<{ accessToken: string; expiresIn: number }> {
     const response = await apiClient.post('/auth/refresh', { refreshToken });
-    return response.data;
+    return response.data.data || response.data;
   }
 
   /**
@@ -47,7 +49,7 @@ export class AuthService {
    */
   static async getCurrentUser(): Promise<User> {
     const response = await apiClient.get('/auth/me');
-    return response.data;
+    return response.data.data || response.data;
   }
 
   /**
@@ -55,7 +57,7 @@ export class AuthService {
    */
   static async checkLoginAttempts(email: string): Promise<LoginAttempt> {
     const response = await apiClient.get('/auth/login-attempts', { params: { email } });
-    return response.data;
+    return response.data.data || response.data;
   }
 
   /**
@@ -84,7 +86,7 @@ export class AuthService {
    */
   static async getSessions(): Promise<Session[]> {
     const response = await apiClient.get('/auth/sessions');
-    return response.data;
+    return response.data.data || response.data;
   }
 
   /**
