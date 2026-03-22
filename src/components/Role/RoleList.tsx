@@ -178,7 +178,7 @@ export const RoleList: React.FC<RoleListProps> = ({
               </div>
             </div>
             {role.isSystem && (
-              <Lock className="w-4 h-4 text-gray-400" title="系统角色" />
+              <Lock className="w-4 h-4 text-gray-400" />
             )}
           </div>
 
@@ -220,7 +220,7 @@ export const RoleList: React.FC<RoleListProps> = ({
                     @{role.code}
                   </span>
                   {role.isSystem && (
-                    <Lock className="w-3.5 h-3.5 text-gray-400" title="系统角色" />
+                    <Lock className="w-3.5 h-3.5 text-gray-400" />
                   )}
                   <span
                     className={cn(

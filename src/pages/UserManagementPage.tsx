@@ -1,18 +1,21 @@
 /**
- * 用户管理页面（带角色管理Tab）
+ * 用户管理页面（带角色和权限管理Tab）
  *
- * 集成用户列表和角色管理功能
+ * 集成用户列表、角色管理和权限管理功能
  * - 用户管理Tab：用户列表展示、筛选、搜索
  * - 角色管理Tab：角色列表展示、权限查看
+ * - 权限管理Tab：权限列表展示、角色权限映射
  *
  * @author Frontend Developer
  * @date 2026-03-23
  */
 import React, { useState } from 'react';
 import { Tabs } from 'antd';
-import { UserOutlined, TeamOutlined } from '@ant-design/icons';
+import { UserOutlined, TeamOutlined, SafetyOutlined } from '@ant-design/icons';
 import UserList from '@/components/User/UserList';
 import RoleList from '@/components/Role/RoleList';
+import PermissionList from '@/components/Permission/PermissionList';
+import RolePermissionMapping from '@/components/Permission/RolePermissionMapping';
 
 const { TabPane } = Tabs;
 
@@ -20,9 +23,11 @@ const { TabPane } = Tabs;
  * 用户管理页面组件
  *
  * 功能：
- * - Tab切换：用户管理 / 角色管理
+ * - Tab切换：用户管理 / 角色管理 / 权限管理
  * - 用户列表展示（支持分页）
  * - 角色列表展示（支持权限查看）
+ * - 权限列表展示（支持资源分组和筛选）
+ * - 角色权限映射（支持权限分配）
  * - 角色筛选和管理
  * - 状态筛选和管理
  * - 用户搜索（用户名/邮箱）
@@ -35,6 +40,8 @@ const UserManagementPage: React.FC = () => {
    * 当前激活的Tab
    * - users: 用户管理
    * - roles: 角色管理
+   * - permissions: 权限管理
+   * - role-permission-mapping: 角色权限映射
    */
   const [activeTab, setActiveTab] = useState<string>('users');
 
@@ -88,6 +95,47 @@ const UserManagementPage: React.FC = () => {
     </div>
   );
 
+  /**
+   * 渲染权限管理Tab
+   */
+  const renderPermissionManagement = () => (
+    <div className="permission-management-tab">
+      {/*
+        PermissionList组件已经包含完整的UI功能：
+        - 标题栏（权限管理 + 权限数量）
+        - 筛选区域（关键词搜索、资源筛选、类型筛选）
+        - 权限列表（按资源分组显示）
+        - 权限详情展示
+        - 加载、错误、空状态处理
+      */}
+      <PermissionList
+        showTitle={true}
+        displayMode="grouped"
+      />
+    </div>
+  );
+
+  /**
+   * 渲染角色权限映射Tab
+   */
+  const renderRolePermissionMapping = () => (
+    <div className="role-permission-mapping-tab">
+      {/*
+        RolePermissionMapping组件已经包含完整的UI功能：
+        - 标题栏（角色权限映射）
+        - 角色列表（左侧）
+        - 权限列表（右侧）
+        - 角色选择
+        - 权限分配（可选）
+        - 加载、错误、空状态处理
+      */}
+      <RolePermissionMapping
+        showTitle={true}
+        editMode={false}
+      />
+    </div>
+  );
+
   return (
     <div className="user-management-page-wrapper">
       {/*
@@ -134,13 +182,39 @@ const UserManagementPage: React.FC = () => {
         >
           {renderRoleManagement()}
         </TabPane>
+
+        {/* 权限管理Tab */}
+        <TabPane
+          tab={
+            <span className="flex items-center">
+              <SafetyOutlined className="mr-2" />
+              权限管理
+            </span>
+          }
+          key="permissions"
+        >
+          {renderPermissionManagement()}
+        </TabPane>
+
+        {/* 角色权限映射Tab */}
+        <TabPane
+          tab={
+            <span className="flex items-center">
+              <SafetyOutlined className="mr-2" />
+              角色权限映射
+            </span>
+          }
+          key="role-permission-mapping"
+        >
+          {renderRolePermissionMapping()}
+        </TabPane>
       </Tabs>
 
       {/* 
         内联样式：确保Tab内容区域样式正确
         注意：这里使用内联样式是为了快速调整，后续可以移到CSS文件中
       */}
-      <style jsx global>{`
+      <style>{`
         .user-management-page-wrapper {
           min-height: 100vh;
           background-color: #f5f5f5;
