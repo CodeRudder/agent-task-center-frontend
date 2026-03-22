@@ -9,3 +9,4 @@ export * from './task';
 export * from './comment';
 export * from './dashboard';
 export * from './template';
+export * from './user';

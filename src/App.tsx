@@ -1,95 +1,121 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { TaskList } from './pages/TaskList';
-import { TaskDetail } from './pages/TaskDetail';
-import { LoginPage } from './pages/LoginPage';
-import { UserProfilePage } from './pages/UserProfilePage';
-import { UserManagementPage } from './components/User-management';
-import { ProtectedRoute } from './components/ProtectedRoute';
-import './index.css';
-
 /**
  * 主应用组件
- * 
- * 配置路由和全局布局
  */
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from '@/stores/authStore';
+import LoginPage from '@/pages/LoginPage';
+import TokenManagementPage from '@/pages/TokenManagementPage';
+import TaskListPage from '@/pages/TaskListPage';
+import TaskDetailPage from '@/pages/TaskDetailPage';
+import UserManagementPage from '@/pages/UserManagementPage';
+import ToastContainer from '@/components/Toast';
+import Layout from '@/components/Layout';
+
+// 受保护的路由组件
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+// 公共路由组件
+const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useAuthStore();
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 function App() {
-  // 模拟总用户数（用于投票参与率计算）
-  const TOTAL_USERS = 25;
 
   return (
-    <Router>
+    <BrowserRouter>
+      <ToastContainer
+        toasts={[]}
+        onRemove={() => {}}
+      />
+
       <Routes>
-        {/* 登录页面 */}
-        <Route path="/login" element={<LoginPage />} />
-        
-        {/* 首页重定向到任务列表 */}
-        <Route path="/" element={<Navigate to="/tasks" replace />} />
-        
-        {/* 任务列表页（需要认证） */}
-        <Route 
-          path="/tasks" 
+        {/* 公共路由 */}
+        <Route
+          path="/login"
           element={
-            <ProtectedRoute>
-              <TaskList 
-                showSearch={true}
-                showFilters={true}
-                showCreateButton={true}
-              />
-            </ProtectedRoute>
-          } 
+            <PublicRoute>
+              <LoginPage />
+            </PublicRoute>
+          }
         />
-        
-        {/* 任务详情页（需要认证） */}
-        <Route 
-          path="/tasks/:taskId" 
+
+        {/* 受保护的路由 */}
+        <Route
+          path="/"
           element={
             <ProtectedRoute>
-              <TaskDetail totalUsers={TOTAL_USERS} />
+              <Layout>
+              <TokenManagementPage />
+            </Layout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        {/* 用户管理页（需要认证，管理员权限） */}
-        <Route 
-          path="/users" 
+
+        <Route
+          path="/tokens"
           element={
             <ProtectedRoute>
+              <Layout>
+              <TokenManagementPage />
+            </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 任务管理路由 */}
+        <Route
+          path="/tasks"
+          element={
+            <ProtectedRoute>
+              <Layout>
+              <TaskListPage />
+            </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tasks/:id"
+          element={
+            <ProtectedRoute>
+              <Layout>
+              <TaskDetailPage />
+            </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 用户管理路由 - V5.6 P0用户管理RBAC权限系统 */}
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <Layout>
               <UserManagementPage />
+            </Layout>
             </ProtectedRoute>
-          } 
+          }
         />
-        
-        {/* 用户个人信息页（需要认证） */}
-        <Route 
-          path="/user/profile" 
-          element={
-            <ProtectedRoute>
-              <UserProfilePage />
-            </ProtectedRoute>
-          } 
-        />
-        
-        {/* 404页面 */}
-        <Route 
-          path="*" 
-          element={
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="text-4xl font-bold text-gray-800 mb-4">404</h1>
-                <p className="text-gray-600 mb-4">页面不存在</p>
-                <a 
-                  href="/tasks" 
-                  className="text-blue-600 hover:underline"
-                >
-                  返回任务列表
-                </a>
-              </div>
-            </div>
-          } 
-        />
+
+        {/* 默认重定向 */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 }
 
