@@ -10,7 +10,6 @@ import {
   PasswordResetRequest,
   PasswordResetConfirm,
   ChangePasswordRequest,
-  LoginAttempt,
 } from '@/types';
 
 export class AuthService {
@@ -47,14 +46,6 @@ export class AuthService {
    */
   static async getCurrentUser(): Promise<User> {
     const response = await apiClient.get('/auth/me');
-    return response.data;
-  }
-
-  /**
-   * 检查登录尝试次数
-   */
-  static async checkLoginAttempts(email: string): Promise<LoginAttempt> {
-    const response = await apiClient.get('/auth/login-attempts', { params: { email } });
     return response.data;
   }
 

@@ -4,12 +4,11 @@
 
 export enum UserRole {
   ADMIN = 'admin',
-  MANAGER = 'manager',
   PROJECT_MANAGER = 'project_manager',
+  MANAGER = 'manager',
   USER = 'user',
 }
 
-// 用户状态
 export enum UserStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
@@ -40,13 +39,14 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  username?: string;
   role: UserRole;
-  status?: UserStatus; // 用户状态
-  avatar?: string; // 用户头像
-  department?: string; // 部门
-  phone?: string; // 电话
+  status?: UserStatus;
+  avatar?: string;
+  phone?: string;
+  department?: string;
   createdAt: string;
-  updatedAt?: string; // 更新时间
+  updatedAt?: string;
   lastLoginAt?: string;
 }
 
@@ -93,12 +93,4 @@ export interface PasswordValidation {
     number: boolean;
     specialChar: boolean;
   };
-}
-
-export interface LoginAttempt {
-  failedAttempts: number;
-  remainingAttempts: number;
-  isLocked: boolean;
-  lockExpiresAt?: string;
-  lockRemainingTime?: number;
 }

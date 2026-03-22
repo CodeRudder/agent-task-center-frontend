@@ -3,7 +3,7 @@
  */
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, UserRole, Session, LoginAttempt } from '@/types';
+import { User, UserRole, Session } from '@/types';
 import AuthService from '@/services/authService';
 
 interface AuthState {
@@ -13,14 +13,12 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   sessions: Session[];
-  loginAttempts: LoginAttempt | null;
 
   // Actions
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   logout: () => Promise<void>;
   getCurrentUser: () => Promise<void>;
   refreshToken: () => Promise<void>;
-  checkLoginAttempts: (email: string) => Promise<LoginAttempt>;
   clearError: () => void;
   loadSessions: () => Promise<void>;
   logoutSession: (sessionId: string) => Promise<void>;
@@ -45,7 +43,6 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
       error: null,
       sessions: [],
-      loginAttempts: null,
 
       // 登录
       login: async (email: string, password: string, rememberMe = false) => {
@@ -156,22 +153,6 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: false,
           });
           throw error;
-        }
-      },
-
-      // 检查登录尝试次数
-      checkLoginAttempts: async (email: string) => {
-        try {
-          const attempts = await AuthService.checkLoginAttempts(email);
-          set({ loginAttempts: attempts });
-          return attempts;
-        } catch (error) {
-          console.error('Error checking login attempts:', error);
-          return {
-            failedAttempts: 0,
-            remainingAttempts: 5,
-            isLocked: false,
-          };
         }
       },
 

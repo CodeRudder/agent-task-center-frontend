@@ -1,18 +1,17 @@
 /**
  * 登录页面
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useToast } from '@/hooks/useToast';
 import PasswordInput from '@/components/PasswordInput';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
-import LoginError from '@/components/LoginError';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { login, loginAttempts, checkLoginAttempts, error, clearError } = useAuthStore();
+  const { login, error, clearError } = useAuthStore();
   const { showToast } = useToast();
 
   const [email, setEmail] = useState('');
@@ -20,13 +19,6 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorType, setErrorType] = useState<'invalid_credentials' | 'account_locked' | 'unknown'>('unknown');
-
-  // 检查登录尝试次数
-  useEffect(() => {
-    if (email) {
-      checkLoginAttempts(email);
-    }
-  }, [email, checkLoginAttempts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,24 +28,15 @@ export default function LoginPage() {
       return;
     }
 
-    // 检查账户是否锁定
-    if (loginAttempts?.isLocked) {
-      setErrorType('account_locked');
-      return;
-    }
-
     setIsLoading(true);
     clearError();
 
     try {
       await login(email, password, rememberMe);
       showToast('登录成功', 'success');
-      navigate('/');
+      navigate('/tasks');
     } catch (error: any) {
       setErrorType('invalid_credentials');
-
-      // 重新检查登录尝试次数
-      await checkLoginAttempts(email);
     } finally {
       setIsLoading(false);
     }
@@ -79,28 +62,6 @@ export default function LoginPage() {
             <p className="text-gray-500 mt-2">登录以管理您的Agent和任务</p>
           </div>
 
-          {/* 错误提示 */}
-          {error && errorType === 'invalid_credentials' && loginAttempts && !loginAttempts.isLocked && (
-            <div className="mb-6">
-              <LoginError
-                type="invalid_credentials"
-                loginAttempt={loginAttempts}
-                onRetry={() => setErrorType('unknown')}
-                onForgotPassword={handleForgotPassword}
-              />
-            </div>
-          )}
-
-          {loginAttempts?.isLocked && (
-            <div className="mb-6">
-              <LoginError
-                type="account_locked"
-                loginAttempt={loginAttempts}
-                onForgotPassword={handleForgotPassword}
-              />
-            </div>
-          )}
-
           {/* 登录表单 */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <Input
@@ -109,7 +70,7 @@ export default function LoginPage() {
               placeholder="admin@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading || loginAttempts?.isLocked}
+              disabled={isLoading}
               autoComplete="username"
               autoFocus
             />
@@ -119,7 +80,7 @@ export default function LoginPage() {
               placeholder="输入密码"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading || loginAttempts?.isLocked}
+              disabled={isLoading}
               autoComplete="current-password"
             />
 
@@ -130,7 +91,7 @@ export default function LoginPage() {
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                   className="h-4 w-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
-                  disabled={isLoading || loginAttempts?.isLocked}
+                  disabled={isLoading}
                 />
                 <span className="ml-2 text-sm text-gray-600">
                   记住我（7天内免登录）
@@ -151,7 +112,6 @@ export default function LoginPage() {
               fullWidth
               size="lg"
               loading={isLoading}
-              disabled={loginAttempts?.isLocked}
             >
               登录
             </Button>
