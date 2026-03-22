@@ -470,4 +470,3 @@ export const TaskList: React.FC<TaskListProps> = ({
 };
 
 export default TaskList;
-"flex items-center gap-1">
