@@ -2,11 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import App from './App';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import TaskList from './pages/TaskList';
 import TaskDetail from './pages/TaskDetail';
-import AgentList from './pages/AgentList';
-import AgentCreate from './pages/AgentCreate';
-import AgentDetail from './pages/AgentDetail';
 import TaskTemplates from './pages/TaskTemplates';
 // 用户管理页面 - V5.6 P0用户管理RBAC权限系统
 import UserManagementPage from './pages/UserManagementPage';
@@ -44,24 +40,8 @@ export const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: 'tasks',
-        element: <TaskList />,
-      },
-      {
         path: 'tasks/:id',
         element: <TaskDetail />,
-      },
-      {
-        path: 'agents',
-        element: <AgentList />,
-      },
-      {
-        path: 'agents/create',
-        element: <AgentCreate />,
-      },
-      {
-        path: 'agents/:id',
-        element: <AgentDetail />,
       },
       {
         path: 'templates',
