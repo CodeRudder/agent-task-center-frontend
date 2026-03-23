@@ -1,5 +1,6 @@
 import api from './api';
-import { Task, TaskStatus, TaskPriority } from '../pages/TaskList';
+import type { Task } from '../types';
+import { TaskStatus, TaskPriority } from '../types';
 
 /**
  * 任务服务 - 负责任务相关的API调用

@@ -3,43 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { VotingSummary } from '../components/VotingSummary';
 import { Search, Filter, Plus, User, Clock, ChevronRight } from 'lucide-react';
 import { getTasks, isAuthenticated } from '../services/taskService';
-
-/**
- * 任务状态枚举
- */
-export enum TaskStatus {
-  PENDING = 'pending',
-  IN_PROGRESS = 'in_progress',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled',
-}
-
-/**
- * 任务优先级枚举
- */
-export enum TaskPriority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  URGENT = 'urgent',
-}
-
-/**
- * 任务数据接口
- */
-export interface Task {
-  id: string;
-  title: string;
-  description: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  assignee?: string;
-  assigneeId?: string;
-  creator?: string;
-  tags?: string[];
-  dueDate?: string;
-  createdAt: string;
-}
+import type { Task } from '../types';
+import { TaskStatus, TaskPriority } from '../types';
 
 /**
  * 状态标签配置
@@ -470,4 +435,3 @@ export const TaskList: React.FC<TaskListProps> = ({
 };
 
 export default TaskList;
-"flex items-center gap-1">

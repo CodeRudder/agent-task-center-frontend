@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Avatar, AvatarFallback } from '../components/ui/avatar';
+import { Avatar } from '../components/ui/avatar';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { getCurrentUser, fetchUserProfile, User } from '../services/authService';
-import { Mail, Shield, Calendar, Clock, User as UserIcon } from 'lucide-react';
+import { getCurrentUser, fetchUserProfile } from '../services/authService';
+import type { User } from '../services/authService';
+import { Mail, Shield, User as UserIcon } from 'lucide-react';
 
 /**
  * 用户个人信息页面
@@ -78,22 +79,6 @@ export const UserProfilePage: React.FC = () => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   };
 
-  const formatDate = (dateString?: string): string => {
-    if (!dateString) return '未记录';
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
-    } catch {
-      return '未记录';
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -128,11 +113,7 @@ export const UserProfilePage: React.FC = () => {
         <Card className="mb-6">
           <CardHeader>
             <div className="flex items-center space-x-4">
-              <Avatar className="h-20 w-20">
-                <AvatarFallback className="text-2xl bg-blue-600 text-white">
-                  {getAvatarFallback(user.name)}
-                </AvatarFallback>
-              </Avatar>
+              <Avatar className="h-20 w-20" fallback={getAvatarFallback(user.name)} size="lg" />
               <div>
                 <CardTitle className="text-2xl">{user.name}</CardTitle>
                 <CardDescription className="mt-1">

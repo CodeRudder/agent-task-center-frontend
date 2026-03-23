@@ -1,0 +1,43 @@
+// 用户管理类型定义
+
+export type UserRole = 'admin' | 'project_manager' | 'user';
+export type UserStatus = 'active' | 'disabled';
+
+export interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+  createdAt: string;
+  lastLoginAt: string | null;
+}
+
+export interface Permission {
+  id: number;
+  name: string;
+  resource: string;
+  action: string;
+  description: string;
+}
+
+export interface RoleInfo {
+  name: UserRole;
+  displayName: string;
+  description: string;
+}
+
+export interface UserListParams {
+  page?: number;
+  pageSize?: number;
+  role?: UserRole;
+  status?: UserStatus;
+  search?: string;
+}
+
+export interface UserListResponse {
+  users: User[];
+  total: number;
+  page: number;
+  pageSize: number;
+}

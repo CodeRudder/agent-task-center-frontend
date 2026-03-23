@@ -1,0 +1,121 @@
+import { create } from 'zustand';
+import type { User, Permission, RoleInfo, UserListParams, UserRole, UserStatus } from '../types/user';
+import { userService } from '../services/userService';
+
+interface UserState {
+  users: User[];
+  currentUser: User | null;
+  permissions: Permission[];
+  roles: RoleInfo[];
+  total: number;
+  page: number;
+  pageSize: number;
+  loading: boolean;
+  error: string | null;
+
+  // Actions
+  fetchUsers: (params: UserListParams) => Promise<void>;
+  fetchUserById: (id: number) => Promise<void>;
+  updateUserRole: (id: number, role: UserRole) => Promise<void>;
+  updateUserStatus: (id: number, status: UserStatus) => Promise<void>;
+  fetchPermissions: () => Promise<void>;
+  fetchRoles: () => Promise<void>;
+  setCurrentUser: (user: User | null) => void;
+  clearError: () => void;
+}
+
+export const useUserStore = create<UserState>((set, get) => ({
+  users: [],
+  currentUser: null,
+  permissions: [],
+  roles: [],
+  total: 0,
+  page: 1,
+  pageSize: 20,
+  loading: false,
+  error: null,
+
+  fetchUsers: async (params: UserListParams) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await userService.getUsers(params);
+      set({
+        users: response.users,
+        total: response.total,
+        page: response.page,
+        pageSize: response.pageSize,
+        loading: false,
+      });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  fetchUserById: async (id: number) => {
+    set({ loading: true, error: null });
+    try {
+      const user = await userService.getUserById(id);
+      set({ currentUser: user, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  updateUserRole: async (id: number, role: UserRole) => {
+    set({ loading: true, error: null });
+    try {
+      await userService.updateUserRole(id, role);
+      // 更新本地状态
+      const { users } = get();
+      const updatedUsers = users.map(user => 
+        user.id === id ? { ...user, role } : user
+      );
+      set({ users: updatedUsers, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  updateUserStatus: async (id: number, status: UserStatus) => {
+    set({ loading: true, error: null });
+    try {
+      await userService.updateUserStatus(id, status);
+      // 更新本地状态
+      const { users } = get();
+      const updatedUsers = users.map(user => 
+        user.id === id ? { ...user, status } : user
+      );
+      set({ users: updatedUsers, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  fetchPermissions: async () => {
+    set({ loading: true, error: null });
+    try {
+      const permissions = await userService.getPermissions();
+      set({ permissions, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  fetchRoles: async () => {
+    set({ loading: true, error: null });
+    try {
+      const roles = await userService.getRoles();
+      set({ roles, loading: false });
+    } catch (error: any) {
+      set({ error: error.message, loading: false });
+    }
+  },
+
+  setCurrentUser: (user: User | null) => {
+    set({ currentUser: user });
+  },
+
+  clearError: () => {
+    set({ error: null });
+  },
+}));
