@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { VotingArea } from '../components/VotingArea';
+import { CopyButton } from '../components/CopyButton';
 import { ArrowLeft, Clock, User, Tag, CheckCircle } from 'lucide-react';
 import type { Task } from '../types';
 import { TaskStatus, TaskPriority } from '../types';
+import { getTaskById } from '../services/taskService';
 
 /**
  * 状态标签配置
@@ -101,36 +103,18 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
       return;
     }
 
-    // TODO: 替换为实际API调用
+    // 使用真实API调用获取任务详情
     const fetchTask = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // 模拟API延迟
-        await new Promise(resolve => setTimeout(resolve, 500));
-
-        // 模拟任务数据
-        const mockTask: Task = {
-          id: taskId,
-          title: `任务 ${taskId}`,
-          description: '这是一个任务描述。支持Markdown格式。\n\n**主要功能：**\n- 功能1\n- 功能2\n- 功能3',
-          status: TaskStatus.IN_PROGRESS,
-          priority: TaskPriority.HIGH,
-          assignee: '张三',
-          assigneeId: 'user-001',
-          creator: '李四',
-          creatorId: 'user-002',
-          tags: ['前端', 'React', 'UI'],
-          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        };
-
-        setTask(mockTask);
-      } catch (err) {
+        // 调用真实的API获取任务详情
+        const taskData = await getTaskById(taskId);
+        setTask(taskData);
+      } catch (err: any) {
         console.error('Failed to fetch task:', err);
-        setError('获取任务详情失败');
+        setError(err.message || '获取任务详情失败');
       } finally {
         setLoading(false);
       }
@@ -215,7 +199,14 @@ export const TaskDetail: React.FC<TaskDetailProps> = ({
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <span className="text-sm font-mono text-gray-500">#{task.id}</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-mono text-gray-500">#{task.shortId || task.id.slice(0, 8)}</span>
+                  <CopyButton 
+                    text={`#${task.shortId || task.id.slice(0, 8)}`}
+                    size="sm"
+                    showTooltip={true}
+                  />
+                </div>
                 <span className={`px-2.5 py-1 text-xs font-medium rounded-full border ${statusConfig.bgColor} ${statusConfig.color}`}>
                   {statusConfig.label}
                 </span>

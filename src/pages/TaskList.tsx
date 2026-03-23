@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { VotingSummary } from '../components/VotingSummary';
+import { CopyButton } from '../components/CopyButton';
 import { Search, Filter, Plus, User, Clock, ChevronRight } from 'lucide-react';
 import { getTasks, isAuthenticated } from '../services/taskService';
 import type { Task } from '../types';
@@ -94,6 +95,7 @@ export const TaskList: React.FC<TaskListProps> = ({
   const [loading, setLoading] = useState(!initialTasks);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [shortIdQuery, setShortIdQuery] = useState(''); // shortId查询
   const [statusFilter, setStatusFilter] = useState<TaskStatus | 'all'>('all');
   const [sortBy, setSortBy] = useState<SortOption>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
@@ -118,8 +120,8 @@ export const TaskList: React.FC<TaskListProps> = ({
           return;
         }
 
-        // 调用真实API获取任务列表
-        const tasks = await getTasks();
+        // 调用真实API获取任务列表（传递shortId参数）
+        const tasks = await getTasks(undefined, shortIdQuery || undefined);
         setTasks(tasks);
       } catch (err: any) {
         console.error('Failed to fetch tasks:', err);
@@ -130,7 +132,7 @@ export const TaskList: React.FC<TaskListProps> = ({
     };
 
     fetchTasks();
-  }, [initialTasks]);
+  }, [initialTasks, shortIdQuery]);
 
   // 过滤和排序任务
   const filteredAndSortedTasks = React.useMemo(() => {
@@ -254,6 +256,18 @@ export const TaskList: React.FC<TaskListProps> = ({
           {/* 搜索和筛选 */}
           {(showSearch || showFilters) && (
             <div className="flex flex-wrap items-center gap-4">
+              {/* shortId查询框 */}
+              <div className="w-32 relative">
+                <input
+                  type="text"
+                  placeholder="ID查询..."
+                  value={shortIdQuery}
+                  onChange={(e) => setShortIdQuery(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  aria-label="按短ID查询任务"
+                />
+              </div>
+
               {/* 搜索框 */}
               {showSearch && (
                 <div className="flex-1 min-w-[200px] relative">
@@ -343,11 +357,18 @@ export const TaskList: React.FC<TaskListProps> = ({
                   <div className="flex items-start justify-between">
                     {/* 左侧：任务信息 */}
                     <div className="flex-1 min-w-0">
-                      {/* 第一行：ID + 状态 + 标题 */}
+                      {/* 第一行：shortId + 状态 + 标题 */}
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="text-sm font-mono text-gray-500 flex-shrink-0">
-                          #{task.id}
-                        </span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <span className="text-sm font-mono text-gray-500">
+                            #{task.shortId || task.id.slice(0, 8)}
+                          </span>
+                          <CopyButton 
+                            text={`#${task.shortId || task.id.slice(0, 8)}`}
+                            size="sm"
+                            showTooltip={true}
+                          />
+                        </div>
                         <span className={`px-2 py-0.5 text-xs font-medium rounded-full border flex-shrink-0 ${statusConfig.bgColor} ${statusConfig.color}`}>
                           {statusConfig.label}
                         </span>

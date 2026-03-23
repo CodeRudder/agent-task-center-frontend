@@ -31,6 +31,7 @@ export type TaskPriority = typeof TaskPriority[keyof typeof TaskPriority]
  */
 export interface Task {
   id: string;
+  shortId?: string; // 短ID（数字ID，用于友好显示，如 #12345）
   title: string;
   description: string;
   status: TaskStatus;

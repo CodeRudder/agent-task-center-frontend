@@ -11,6 +11,7 @@ import { TaskStatus, TaskPriority } from '../types';
  */
 interface BackendTask {
   id: string;
+  shortId?: string; // 短ID（数字ID，用于友好显示）
   title: string;
   description: string;
   status: 'todo' | 'in_progress' | 'completed' | 'blocked';
@@ -82,6 +83,7 @@ const PRIORITY_MAP: Record<string, TaskPriority> = {
 const transformTask = (backendTask: BackendTask): Task => {
   return {
     id: backendTask.id,
+    shortId: backendTask.shortId, // 短ID（数字ID）
     title: backendTask.title,
     description: backendTask.description,
     status: STATUS_MAP[backendTask.status] || TaskStatus.PENDING,
@@ -98,14 +100,18 @@ const transformTask = (backendTask: BackendTask): Task => {
 /**
  * 获取任务列表
  * @param search 搜索关键词（可选）
+ * @param shortId 短ID查询（可选）
  * @returns 任务列表
  */
-export const getTasks = async (search?: string): Promise<Task[]> => {
+export const getTasks = async (search?: string, shortId?: string): Promise<Task[]> => {
   try {
     // 实现真实的API调用
     const params: any = {};
     if (search) {
       params.search = search;
+    }
+    if (shortId) {
+      params.shortId = shortId;
     }
 
     const response = await api.get<ApiResponse<TaskListResponse>>('/tasks', { params });
