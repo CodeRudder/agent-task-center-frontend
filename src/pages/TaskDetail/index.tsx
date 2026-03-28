@@ -24,6 +24,7 @@ import {
 import { taskService, Task } from '../../services/task.service';
 import { useTaskStore } from '../../stores/task.store';
 import { formatDate, getPriorityColor } from '../../utils/storage';
+import CommentList from '../../components/Comment/CommentList';
 
 const { TextArea } = Input;
 
@@ -206,6 +207,8 @@ const TaskDetail: React.FC = () => {
         </div>
 
         <Divider />
+
+        <CommentList taskId={task.id} />
 
         {task.status === 'done' && (
           <div>
