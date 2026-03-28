@@ -25,6 +25,10 @@ import {
 } from 'lucide-react';
 
 const TaskListPage: React.FC = () => {
+  // 🔍 调试日志 - 组件开始渲染
+  console.log('🔍 ========== TaskListPage 组件开始渲染 ==========');
+  console.log('🔍 组件加载时间:', new Date().toISOString());
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editTaskId, setEditTaskId] = useState<string | null>(null);
@@ -34,6 +38,8 @@ const TaskListPage: React.FC = () => {
   const [taskToDelete, setTaskToDelete] = useState<{ id: string; title: string } | null>(null);
   const [batchDeleteDialogOpen, setBatchDeleteDialogOpen] = useState(false);
   const [batchArchiveDialogOpen, setBatchArchiveDialogOpen] = useState(false);
+
+  console.log('🔍 State初始化完成');
 
   const {
     tasks,
@@ -54,19 +60,45 @@ const TaskListPage: React.FC = () => {
 
   const { loadAgents } = useAgentStore();
 
+  console.log('🔍 useTaskStore和useAgentStore加载完成');
+  console.log('🔍 tasks数量:', tasks?.length || 0);
+  console.log('🔍 isLoading:', isLoading);
+
   useEffect(() => {
-    loadTasks();
-    loadAgents();
+    console.log('🔍 ========== useEffect [] 执行 ==========');
+    console.log('🔍 开始加载tasks和agents');
+    
+    const loadData = async () => {
+      try {
+        console.log('🔍 Calling loadTasks...');
+        await loadTasks();
+        console.log('🔍 loadTasks completed');
+        
+        console.log('🔍 Calling loadAgents...');
+        await loadAgents();
+        console.log('🔍 loadAgents completed');
+        
+        console.log('🔍 loadTasks和loadAgents已成功完成');
+      } catch (error) {
+        console.error('🔍 useEffect错误:', error);
+      }
+    };
+    
+    loadData();
   }, []);
 
   useEffect(() => {
+    console.log('🔍 ========== useEffect [searchTerm] 执行 ==========');
+    console.log('🔍 searchTerm:', searchTerm);
     const timeoutId = setTimeout(() => {
+      console.log('🔍 搜索超时触发，设置filters');
       setFilters({ search: searchTerm || undefined });
       loadTasks();
+      console.log('🔍 loadTasks已调用（搜索）');
     }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, setFilters, loadTasks]);
 
   const handleStatusFilter = (value: string) => {
     setFilters({ status: value === 'all' ? undefined : (value as TaskStatus) });
@@ -232,8 +264,8 @@ const TaskListPage: React.FC = () => {
                 { value: 'all', label: '所有状态' },
                 { value: 'todo', label: '待办' },
                 { value: 'in_progress', label: '进行中' },
-                { value: 'completed', label: '已完成' },
-                { value: 'cancelled', label: '审核中' },
+                { value: 'done', label: '已完成' },
+                { value: 'review', label: '审核中' },
               ]}
               value={filters.status || 'all'}
               onChange={handleStatusFilter}
@@ -367,7 +399,7 @@ const TaskListPage: React.FC = () => {
                       </td>
                       <td className="px-4 py-4">
                         <div className="text-sm font-medium text-gray-900">{task.title}</div>
-                        {task.tags.length > 0 && (
+                        {task.tags && task.tags.length > 0 && (
                           <div className="flex gap-1 mt-1">
                             {task.tags.slice(0, 2).map((tag) => (
                               <span
@@ -468,7 +500,7 @@ const TaskListPage: React.FC = () => {
                           {getPriorityText(task.priority)}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600 mb-2">{task.description.slice(0, 50)}...</p>
+                      <p className="text-xs text-gray-600 mb-2">{task.description?.slice(0, 50) || '无描述'}...</p>
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <span>负责人: {task.assigneeName || '-'}</span>
                         <span>截止: {formatDate(task.dueDate || '')}</span>

@@ -30,7 +30,7 @@ const TaskCreateModal: React.FC<TaskCreateModalProps> = ({ onClose }) => {
   });
 
   const [tagInput, setTagInput] = useState('');
-  const [files, setFiles] = useState<File[]>(null as any);
+  const [files, setFiles] = useState<File[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

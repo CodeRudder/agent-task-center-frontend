@@ -40,24 +40,44 @@ export const useAuthStore = create<AuthState>()(
 
       // 登录
       login: async (email: string, password: string, rememberMe = false) => {
+        console.log('🔍 ========== authStore.login START ==========');
+        console.log('🔍 email:', email);
+        console.log('🔍 password:', password ? '***' : 'EMPTY');
+        console.log('🔍 rememberMe:', rememberMe);
+        
         set({ isLoading: true, error: null });
         try {
+          console.log('🔍 Calling AuthService.login...');
           const response = await AuthService.login({ email, password });
+          console.log('🔍 AuthService.login response:', response);
+          console.log('🔍 response.accessToken:', response.accessToken ? 'EXISTS' : 'MISSING');
+          console.log('🔍 response.user:', response.user);
 
           // 保存Token
+          console.log('🔍 Saving accessToken to localStorage...');
           localStorage.setItem('accessToken', response.accessToken);
           if (rememberMe) {
+            console.log('🔍 Saving refreshToken to localStorage...');
             localStorage.setItem('refreshToken', response.refreshToken);
           }
 
+          console.log('🔍 Updating auth state...');
           set({
             user: response.user,
             isAuthenticated: true,
             isLoading: false,
             error: null,
           });
+          console.log('🔍 ========== authStore.login SUCCESS ==========');
         } catch (error: any) {
+          console.error('🔍 ========== authStore.login ERROR ==========');
+          console.error('🔍 error:', error);
+          console.error('🔍 error.response:', error.response);
+          console.error('🔍 error.message:', error.message);
+          
           const errorMessage = error.response?.data?.message || '登录失败';
+          console.error('🔍 errorMessage:', errorMessage);
+          
           set({
             isLoading: false,
             error: errorMessage,

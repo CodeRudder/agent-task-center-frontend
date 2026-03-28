@@ -29,32 +29,51 @@ export default function LoginPage() {
   }, [email, checkLoginAttempts]);
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('🔍 ========== LoginPage.handleSubmit START ==========');
+    console.log('🔍 email:', email);
+    console.log('🔍 password:', password ? '***' : 'EMPTY');
+    console.log('🔍 rememberMe:', rememberMe);
+    
     e.preventDefault();
 
     if (!email || !password) {
+      console.log('🔍 Missing email or password, showing warning');
       showToast('请输入用户名和密码', 'warning');
       return;
     }
 
     // 检查账户是否锁定
+    console.log('🔍 Checking loginAttempts:', loginAttempts);
     if (loginAttempts?.isLocked) {
+      console.log('🔍 Account is locked, showing error');
       setErrorType('account_locked');
       return;
     }
 
+    console.log('🔍 Setting isLoading to true...');
     setIsLoading(true);
     clearError();
 
     try {
+      console.log('🔍 Calling login function...');
       await login(email, password, rememberMe);
+      console.log('🔍 Login successful, showing toast and navigating...');
       showToast('登录成功', 'success');
       navigate('/');
+      console.log('🔍 ========== LoginPage.handleSubmit SUCCESS ==========');
     } catch (error: any) {
+      console.error('🔍 ========== LoginPage.handleSubmit ERROR ==========');
+      console.error('🔍 error:', error);
+      console.error('🔍 error.response:', error.response);
+      console.error('🔍 error.message:', error.message);
+      
       setErrorType('invalid_credentials');
 
       // 重新检查登录尝试次数
+      console.log('🔍 Re-checking login attempts...');
       await checkLoginAttempts(email);
     } finally {
+      console.log('🔍 Setting isLoading to false...');
       setIsLoading(false);
     }
   };
@@ -155,6 +174,36 @@ export default function LoginPage() {
             >
               登录
             </Button>
+
+            {/* 测试登录按钮 - 绕过表单提交 */}
+            <div className="mt-4">
+              <Button
+                type="button"
+                variant="secondary"
+                fullWidth
+                size="lg"
+                loading={isLoading}
+                onClick={async () => {
+                  console.log('🧪 ========== 测试登录按钮被点击 ==========');
+                  console.log('🧪 直接调用login函数，绕过表单提交');
+                  setIsLoading(true);
+                  try {
+                    console.log('🧪 Calling login with fixed credentials...');
+                    await login('qa5@example.com', 'Test123456', false);
+                    console.log('🧪 测试登录成功！');
+                    showToast('测试登录成功', 'success');
+                    navigate('/');
+                  } catch (error: any) {
+                    console.error('🧪 测试登录失败:', error);
+                    showToast(`测试登录失败: ${error.message || '未知错误'}`, 'error');
+                  } finally {
+                    setIsLoading(false);
+                  }
+                }}
+              >
+                🧪 测试登录（绕过表单）
+              </Button>
+            </div>
           </form>
 
           {/* 安全提示 */}

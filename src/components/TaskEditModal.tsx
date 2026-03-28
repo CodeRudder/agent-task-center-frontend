@@ -31,7 +31,7 @@ const TaskEditModal: React.FC<TaskEditModalProps> = ({ taskId, onClose }) => {
   });
 
   const [tagInput, setTagInput] = useState('');
-  const [files, setFiles] = useState<File[]>(null as any);
+  const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
     loadTask(taskId);

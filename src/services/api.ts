@@ -17,9 +17,42 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem('accessToken');
+    
+    // 先设置 Authorization 头
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    // 🔍 调试日志（在设置 Authorization 头之后）
+    console.log('🔍 ========== API Request Debug ==========');
+    console.log('🔍 Request URL:', config.url);
+    console.log('🔍 Request Method:', config.method);
+    console.log('🔍 Request Headers:', config.headers);
+    console.log('🔍 Authorization Header:', config.headers?.Authorization);
+    console.log('🔍 Token from localStorage:', token ? `${token.substring(0, 50)}...` : 'NO TOKEN');
+    console.log('🔍 =====================================');
+    
+    // 💾 将调试日志保存到 localStorage（供 QA 读取）
+    try {
+      const debugLog = {
+        timestamp: new Date().toISOString(),
+        url: config.url,
+        method: config.method,
+        hasAuthHeader: !!config.headers?.Authorization,
+        authHeaderValue: config.headers?.Authorization || 'NO AUTH HEADER',
+        hasToken: !!token,
+        tokenPreview: token ? `${token.substring(0, 50)}...` : 'NO TOKEN'
+      };
+      
+      // 保存最近10条日志
+      const logs = JSON.parse(localStorage.getItem('__API_DEBUG_LOGS__') || '[]');
+      logs.push(debugLog);
+      if (logs.length > 10) logs.shift();
+      localStorage.setItem('__API_DEBUG_LOGS__', JSON.stringify(logs));
+    } catch (e) {
+      console.error('Failed to save debug log to localStorage:', e);
+    }
+    
     return config;
   },
   (error) => {
@@ -33,6 +66,16 @@ apiClient.interceptors.response.use(
     return response;
   },
   async (error: AxiosError) => {
+    // 🔍 详细错误日志
+    console.error('🔍 ========== API Response Error ==========');
+    console.error('🔍 Request URL:', error.config?.url);
+    console.error('🔍 Request Method:', error.config?.method);
+    console.error('🔍 Error Status:', error.response?.status);
+    console.error('🔍 Error Status Text:', error.response?.statusText);
+    console.error('🔍 Error Data:', error.response?.data);
+    console.error('🔍 Error Message:', error.message);
+    console.error('🔍 =====================================');
+
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
     if (error.response?.status === 401 && !originalRequest._retry) {

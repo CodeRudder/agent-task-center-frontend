@@ -16,12 +16,12 @@ import Modal from '@/components/Modal';
 
 export default function TokenManagementPage() {
   const {
-    agents,
-    selectedAgents,
-    isLoading,
-    error,
-    pagination,
-    filters,
+    agents = [], // 默认空数组
+    selectedAgents = [],
+    isLoading = false,
+    error = null,
+    pagination = { page: 1, pageSize: 20, total: 0, totalPages: 0 },
+    filters = {},
     loadAgents,
     toggleAgentSelection,
     toggleAllAgents,
@@ -31,7 +31,7 @@ export default function TokenManagementPage() {
     revokeToken,
     batchRevokeTokens,
     clearError,
-  } = useAgentStore();
+  } = useAgentStore() || {};
 
   const { showToast } = useToast();
 
