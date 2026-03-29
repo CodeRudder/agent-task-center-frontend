@@ -25,10 +25,10 @@ export interface AuthResponse {
 export const authService = {
   // 登录
   login: async (data: LoginDTO): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login', data);
+    const response = await api.post<{ success: boolean; data: AuthResponse }>('/auth/login', data);
     // 修复：后端返回格式是 { success: true, data: { accessToken, user } }
     // 需要返回 response.data.data 获取真正的数据
-    return response.data.data as AuthResponse;
+    return response.data.data;
   },
 
   // 注册

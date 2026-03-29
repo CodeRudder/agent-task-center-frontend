@@ -208,7 +208,7 @@ const TaskDetail: React.FC = () => {
 
         <Divider />
 
-        <CommentList taskId={task.id} />
+        <CommentList taskId={String(task.id)} />
 
         {task.status === 'done' && (
           <div>
